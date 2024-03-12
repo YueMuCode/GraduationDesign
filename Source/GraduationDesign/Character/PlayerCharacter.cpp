@@ -4,8 +4,10 @@
 #include "PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GraduationDesign/HUD/OverHeadWidget.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -22,6 +24,10 @@ APlayerCharacter::APlayerCharacter()
 
 	bUseControllerRotationYaw=false;//角色不跟着控制器转动
 	GetCharacterMovement()->bOrientRotationToMovement=true;
+
+	
+	OverheadWidget=CreateDefaultSubobject<UWidgetComponent>(TEXT("OverHeadWidget"));
+	OverheadWidget->SetupAttachment(RootComponent);
 }
 
 void APlayerCharacter::BeginPlay()
