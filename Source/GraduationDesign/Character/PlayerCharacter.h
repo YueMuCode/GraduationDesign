@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
+#include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -20,9 +22,9 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-public:
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;//系统提供的函数，指定对应的变量进行复制
+	void SetOverlapWeapon(AWeaponBaseActor*Weapon);
+	
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -38,7 +40,12 @@ private:
 	UPROPERTY(VisibleAnywhere,Category=Camera)
 	class UCameraComponent* FollowCamera;
 
+	UPROPERTY(ReplicatedUsing=OnRep_OverLapWeapon)//当overlapweapon被复制的时候，应该要调用OnRep_OverLapWeapon函数
+	 AWeaponBaseActor* OverlapWeapon;
 
+	UFUNCTION()
+	void OnRep_OverLapWeapon(AWeaponBaseActor* LastWeapon);//这个函数的第一个参数必须和(ReplicatedUsing宏下的变量类型一致
+	
 
 	//UI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GraduationDesign/HUD/OverHeadWidget.h"
+#include "Net/UnrealNetwork.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -36,7 +37,6 @@ void APlayerCharacter::BeginPlay()
 	
 }
 
-
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -50,8 +50,14 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("MoveRight",this,&ThisClass::MoveRight);
 	PlayerInputComponent->BindAxis("Turn",this,&ThisClass::Turn);
 	PlayerInputComponent->BindAxis("LookUp",this,&ThisClass::LookUp);
-
+	
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ACharacter::Jump);
+}
+
+void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(APlayerCharacter,OverlapWeapon,COND_OwnerOnly);//对OverlapWeapon进行复制，类型为拥有该对象的客户端（通常是服务器）才会复制这个属性
 }
 
 void APlayerCharacter::MoveForward(float value)
@@ -63,7 +69,6 @@ void APlayerCharacter::MoveForward(float value)
 		AddMovementInput(Direction,value);
 	}
 }
-
 void APlayerCharacter::MoveRight(float value)
 {
 	if(Controller!=nullptr&&value!=0.f)
@@ -73,14 +78,42 @@ void APlayerCharacter::MoveRight(float value)
 		AddMovementInput(Direction,value);
 	}
 }
-
 void APlayerCharacter::Turn(float value)
 {
 	AddControllerYawInput(value);
 }
-
 void APlayerCharacter::LookUp(float value)
 {
 	AddControllerPitchInput(value);
+}
+
+void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)
+{
+	if(OverlapWeapon)//如果再次运行到这，意味着此时正在走出碰撞区域
+	{
+		OverlapWeapon->ShowPickUpWidget(false);
+	}
+	
+	OverlapWeapon=Weapon;
+	if(IsLocallyControlled())//当为服务器操作时
+	{
+		if(OverlapWeapon)
+		{
+			OverlapWeapon->ShowPickUpWidget(true);
+		}
+	} 
+}
+
+void APlayerCharacter::OnRep_OverLapWeapon(AWeaponBaseActor* LastWeapon)//当客户端进入到碰撞区域，触发属性复制，下面的函数将会执行
+{
+	if(OverlapWeapon)
+	{
+		OverlapWeapon->ShowPickUpWidget(true);//进入
+	}
+	if(LastWeapon)
+	{
+		LastWeapon->ShowPickUpWidget(false);//离开
+	}
+
 }
 

@@ -26,8 +26,27 @@ public:
 	AWeaponBaseActor();
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	virtual void OnSphereOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	);//当碰撞区域发生碰撞时
+
+	UFUNCTION()
+	void OnSphereEndOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex
+	);
 public:	
 	virtual void Tick(float DeltaTime) override;
+	void ShowPickUpWidget(bool bShowWidget);
 
 
 public:
@@ -38,9 +57,17 @@ private:
 
 	UPROPERTY(VisibleAnywhere,Category="武器组件")
 	USkeletalMeshComponent* WeaponMesh;//武器的网格体SKM
+	
 	UPROPERTY(VisibleAnywhere,Category="武器组件")
 	USphereComponent* AreaSphere;//这把武器的碰撞区域，用与拾取等
-	UPROPERTY(VisibleAnywhere)
+	
+	UPROPERTY(VisibleAnywhere,Category="武器组件")
 	EWeaponState WeaponState;
+
+	UPROPERTY(VisibleAnywhere,Category="武器组件")
+	UStaticMeshComponent*WeaponStaticMesh;
+	
+	 UPROPERTY(VisibleAnywhere,Category="武器组件")
+	 class UWidgetComponent* PickUpWidget;
 
 };
