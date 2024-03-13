@@ -5,6 +5,7 @@
 
 #include "Components/WidgetComponent.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AWeaponBaseActor::AWeaponBaseActor()
@@ -55,6 +56,13 @@ void AWeaponBaseActor::BeginPlay()
 		PickUpWidget->SetVisibility(false);
 	}
 }
+
+void AWeaponBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AWeaponBaseActor,WeaponState);
+}
+
 void AWeaponBaseActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -83,6 +91,28 @@ void AWeaponBaseActor::ShowPickUpWidget(bool bShowWidget)
 	if(PickUpWidget)
 	{
 		PickUpWidget->SetVisibility(bShowWidget);
+	}
+}
+
+void AWeaponBaseActor::SetWeaponState(EWeaponState State)
+{
+	WeaponState=State;
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickUpWidget(false);
+		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);//在服务器上执行
+		break;
+	}
+}
+
+void AWeaponBaseActor::OnRep_WeaponState()
+{
+	switch (WeaponState)
+	{
+	case EWeaponState::EWS_Equipped:
+		ShowPickUpWidget(false);
+		break;
 	}
 }
 

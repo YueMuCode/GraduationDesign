@@ -26,7 +26,7 @@ public:
 	AWeaponBaseActor();
 protected:
 	virtual void BeginPlay() override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;//系统提供的函数，指定对应的变量进行复制
 	UFUNCTION()
 	virtual void OnSphereOverlap(
 		UPrimitiveComponent* OverlappedComponent,
@@ -50,8 +50,8 @@ public:
 
 
 public:
-	FORCEINLINE void SetWeaponState(EWeaponState State){WeaponState=State;}//内联函数它将函数的代码插入到调用函数的地方，而不是跳转到函数的地址执行。
-
+	void SetWeaponState(EWeaponState State);//内联函数它将函数的代码插入到调用函数的地方，而不是跳转到函数的地址执行。
+	FORCEINLINE USphereComponent* GetAreaSphere() const {return AreaSphere;}
 protected:
 
 private:
@@ -62,7 +62,7 @@ private:
 	UPROPERTY(VisibleAnywhere,Category="武器组件")
 	USphereComponent* AreaSphere;//这把武器的碰撞区域，用与拾取等
 	
-	UPROPERTY(VisibleAnywhere,Category="武器组件")
+	UPROPERTY(ReplicatedUsing=OnRep_WeaponState,VisibleAnywhere,Category="武器组件")
 	EWeaponState WeaponState;
 
 	UPROPERTY(VisibleAnywhere,Category="武器组件")
@@ -70,5 +70,8 @@ private:
 	
 	 UPROPERTY(VisibleAnywhere,Category="武器组件")
 	 class UWidgetComponent* PickUpWidget;
+
+	UFUNCTION()
+	void OnRep_WeaponState();
 
 };

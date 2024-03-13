@@ -105,9 +105,16 @@ void APlayerCharacter::LookUp(float value)
 void APlayerCharacter::EquipButtonPressed()
 {
 	//
-	if(CombatComponent&&HasAuthority())
+	if(CombatComponent)
 	{
-		CombatComponent->EquipWeapon(OverlapWeapon);
+		if(HasAuthority())//如果是服务器正在调用
+		{
+			CombatComponent->EquipWeapon(OverlapWeapon);
+		}
+		else//如果不是则客户端发起RPC
+		{
+			ServerEquipButtonPressed();
+		}
 	}
 }
 
@@ -139,5 +146,10 @@ void APlayerCharacter::OnRep_OverLapWeapon(AWeaponBaseActor* LastWeapon)//当客
 		LastWeapon->ShowPickUpWidget(false);//离开
 	}
 
+}
+
+void APlayerCharacter::ServerEquipButtonPressed_Implementation()
+{
+	CombatComponent->EquipWeapon(OverlapWeapon);
 }
 

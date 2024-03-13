@@ -57,4 +57,8 @@ private:
 	//自定义组件
 	UPROPERTY(VisibleAnywhere)
 	UCombatComponent* CombatComponent;
+
+	//RPC
+	UFUNCTION(Server,Reliable)
+	void ServerEquipButtonPressed();//客户端调用，服务器执行
 };
