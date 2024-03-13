@@ -27,6 +27,7 @@ public:
 	virtual void PostInitializeComponents() override;//通常被用于在一个Actor或者Component被创建后立即执行一些额外的初始化操作
 	void SetOverlapWeapon(AWeaponBaseActor*Weapon);
 	bool IsWeaponEquipped();
+	bool IsAiming();
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -34,6 +35,8 @@ protected:
 	void LookUp(float value);
 	void EquipButtonPressed();
 	void CrouchButtonPressed();
+	void AimButtonPressed();
+	void AimButtonReleased();
 
 private:
 

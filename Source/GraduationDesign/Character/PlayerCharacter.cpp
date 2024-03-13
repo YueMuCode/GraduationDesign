@@ -61,6 +61,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ACharacter::Jump);
 	PlayerInputComponent->BindAction("Equip",IE_Pressed,this,&ThisClass::EquipButtonPressed);
 	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ThisClass::CrouchButtonPressed);
+
+	PlayerInputComponent->BindAction("Aim",IE_Pressed,this,&ThisClass::AimButtonPressed);
+	PlayerInputComponent->BindAction("Aim",IE_Released,this,&ThisClass::AimButtonReleased);
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -119,7 +122,6 @@ void APlayerCharacter::EquipButtonPressed()
 		}
 	}
 }
-
 void APlayerCharacter::CrouchButtonPressed()
 {
 	if(bIsCrouched)
@@ -132,6 +134,21 @@ void APlayerCharacter::CrouchButtonPressed()
 	}
 	
 }
+void APlayerCharacter::AimButtonPressed()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->SetAiming(true);
+	}
+}
+void APlayerCharacter::AimButtonReleased()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->SetAiming(false);
+	}
+}
+
 
 void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)
 {
@@ -153,6 +170,11 @@ void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)
 bool APlayerCharacter::IsWeaponEquipped()
 {
 	return (CombatComponent&&CombatComponent->EquippedWeapon);
+}
+
+bool APlayerCharacter::IsAiming()
+{
+	return (CombatComponent&&CombatComponent->bAiming);
 }
 
 void APlayerCharacter::OnRep_OverLapWeapon(AWeaponBaseActor* LastWeapon)//当客户端进入到碰撞区域，触发属性复制，下面的函数将会执行

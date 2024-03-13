@@ -22,13 +22,18 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void  SetAiming(bool bIsAiming);
 
+	UFUNCTION(Server,Reliable)
+	void ServerSetAiming(bool bIsAiming);
 private:
 	 APlayerCharacter* Character;
 
 	UPROPERTY(Replicated)
 	class AWeaponBaseActor* EquippedWeapon;
 
+	UPROPERTY(Replicated)
+	bool bAiming;
 
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);

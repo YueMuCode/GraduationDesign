@@ -19,6 +19,18 @@ void UCombatComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UCombatComponent::SetAiming(bool bIsAiming)
+{
+	bAiming=bIsAiming;
+	ServerSetAiming(bIsAiming);//如果是客户端执行到这里，就会触发从客户端调用的结果。
+	
+}
+
+void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
+{
+	bAiming=bIsAiming;//
+}
+
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -28,7 +40,8 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UCombatComponent,EquippedWeapon);//EquippedWeapon进行复制 
+	DOREPLIFETIME(UCombatComponent,EquippedWeapon);//EquippedWeapon进行复制
+	DOREPLIFETIME(UCombatComponent,bAiming);
 }
 
 void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
