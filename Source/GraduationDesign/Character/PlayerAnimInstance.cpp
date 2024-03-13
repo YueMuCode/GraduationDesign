@@ -31,4 +31,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bIsAccelerating=PlayerCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size()>0.f?true:false;
 
 	bWeaponEquipped=PlayerCharacter->IsWeaponEquipped();
+
+	bIsCrouched=PlayerCharacter->bIsCrouched;//使用框架提供的变量，这个变量是已经可复制的
 }

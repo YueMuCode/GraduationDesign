@@ -33,7 +33,9 @@ APlayerCharacter::APlayerCharacter()
 	//战斗组件
 	CombatComponent=CreateDefaultSubobject<UCombatComponent>(TEXT("战斗组件"));
 	CombatComponent->SetIsReplicated(true);//可以进行复制
-	
+
+
+	GetCharacterMovement()->NavAgentProps.bCanCrouch=true;//开启了运动系统中的蹲伏功能
 }
 
 void APlayerCharacter::BeginPlay()
@@ -58,6 +60,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ACharacter::Jump);
 	PlayerInputComponent->BindAction("Equip",IE_Pressed,this,&ThisClass::EquipButtonPressed);
+	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ThisClass::CrouchButtonPressed);
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -101,7 +104,6 @@ void APlayerCharacter::LookUp(float value)
 {
 	AddControllerPitchInput(value);
 }
-
 void APlayerCharacter::EquipButtonPressed()
 {
 	//
@@ -116,6 +118,19 @@ void APlayerCharacter::EquipButtonPressed()
 			ServerEquipButtonPressed();
 		}
 	}
+}
+
+void APlayerCharacter::CrouchButtonPressed()
+{
+	if(bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Crouch();//调用系统的蹲伏系统
+	}
+	
 }
 
 void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)

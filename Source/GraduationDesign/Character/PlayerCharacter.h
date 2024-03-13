@@ -33,6 +33,7 @@ protected:
 	void Turn(float value);
 	void LookUp(float value);
 	void EquipButtonPressed();
+	void CrouchButtonPressed();
 
 private:
 
