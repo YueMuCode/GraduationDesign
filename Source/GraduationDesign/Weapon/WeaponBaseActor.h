@@ -50,6 +50,7 @@ public:
 
 
 public:
+	FORCEINLINE void SetWeaponState(EWeaponState State){WeaponState=State;}//内联函数它将函数的代码插入到调用函数的地方，而不是跳转到函数的地址执行。
 
 protected:
 

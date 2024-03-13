@@ -29,6 +29,11 @@ APlayerCharacter::APlayerCharacter()
 	
 	OverheadWidget=CreateDefaultSubobject<UWidgetComponent>(TEXT("OverHeadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+
+	//战斗组件
+	CombatComponent=CreateDefaultSubobject<UCombatComponent>(TEXT("战斗组件"));
+	CombatComponent->SetIsReplicated(true);//可以进行复制
+	
 }
 
 void APlayerCharacter::BeginPlay()
@@ -52,12 +57,22 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("LookUp",this,&ThisClass::LookUp);
 	
 	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ACharacter::Jump);
+	PlayerInputComponent->BindAction("Equip",IE_Pressed,this,&ThisClass::EquipButtonPressed);
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(APlayerCharacter,OverlapWeapon,COND_OwnerOnly);//对OverlapWeapon进行复制，类型为拥有该对象的客户端（通常是服务器）才会复制这个属性
+}
+
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	if(CombatComponent)
+	{
+		CombatComponent->Character=this;
+	}
 }
 
 void APlayerCharacter::MoveForward(float value)
@@ -85,6 +100,15 @@ void APlayerCharacter::Turn(float value)
 void APlayerCharacter::LookUp(float value)
 {
 	AddControllerPitchInput(value);
+}
+
+void APlayerCharacter::EquipButtonPressed()
+{
+	//
+	if(CombatComponent&&HasAuthority())
+	{
+		CombatComponent->EquipWeapon(OverlapWeapon);
+	}
 }
 
 void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
+#include "GraduationDesign/PlayerComponent/CombatComponent.h"
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "PlayerCharacter.generated.h"
 
@@ -23,6 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;//系统提供的函数，指定对应的变量进行复制
+	virtual void PostInitializeComponents() override;//通常被用于在一个Actor或者Component被创建后立即执行一些额外的初始化操作
 	void SetOverlapWeapon(AWeaponBaseActor*Weapon);
 	
 protected:
@@ -30,6 +32,7 @@ protected:
 	void MoveRight(float value);
 	void Turn(float value);
 	void LookUp(float value);
+	void EquipButtonPressed();
 
 private:
 
@@ -50,4 +53,8 @@ private:
 	//UI
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UWidgetComponent* OverheadWidget;
+
+	//自定义组件
+	UPROPERTY(VisibleAnywhere)
+	UCombatComponent* CombatComponent;
 };
