@@ -39,4 +39,15 @@ private:
 
 	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
 	bool bIsAiming;
+
+	//以下变量作用于持枪动画
+	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
+	float YawOffset;
+
+	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
+	float Lean;
+
+	FRotator CharacterRotationLastFrame;
+	FRotator CharacterRotation;
+	FRotator DeltaRotation;
 };

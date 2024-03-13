@@ -4,6 +4,7 @@
 #include "CombatComponent.h"
 
 #include "Engine/SkeletalMeshSocket.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Net/UnrealNetwork.h"
@@ -24,6 +25,15 @@ void UCombatComponent::SetAiming(bool bIsAiming)
 	bAiming=bIsAiming;
 	ServerSetAiming(bIsAiming);//如果是客户端执行到这里，就会触发从客户端调用的结果。
 	
+}
+
+void UCombatComponent::OnRep_EquippedWeapon()
+{
+	if(EquippedWeapon&&Character)//客户端实现
+	{
+		Character->GetCharacterMovement()->bOrientRotationToMovement=false;
+		Character->bUseControllerRotationYaw=true;
+	}
 }
 
 void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
@@ -58,4 +68,7 @@ void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 	}
 	EquippedWeapon->SetOwner(Character);
 
+	//当持枪的时候，需要将视角锁定,并且跟随控制器旋转
+	Character->GetCharacterMovement()->bOrientRotationToMovement=false;
+	Character->bUseControllerRotationYaw=true;
 }
