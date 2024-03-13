@@ -26,7 +26,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;//系统提供的函数，指定对应的变量进行复制
 	virtual void PostInitializeComponents() override;//通常被用于在一个Actor或者Component被创建后立即执行一些额外的初始化操作
 	void SetOverlapWeapon(AWeaponBaseActor*Weapon);
-	
+	bool IsWeaponEquipped();
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);

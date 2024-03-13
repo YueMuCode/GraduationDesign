@@ -135,6 +135,11 @@ void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)
 	} 
 }
 
+bool APlayerCharacter::IsWeaponEquipped()
+{
+	return (CombatComponent&&CombatComponent->EquippedWeapon);
+}
+
 void APlayerCharacter::OnRep_OverLapWeapon(AWeaponBaseActor* LastWeapon)//当客户端进入到碰撞区域，触发属性复制，下面的函数将会执行
 {
 	if(OverlapWeapon)
