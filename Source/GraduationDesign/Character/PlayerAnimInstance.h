@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "GraduationDesign/TypeFiles/TurningInPlace.h"
 #include "PlayerAnimInstance.generated.h"
 
 /**
@@ -62,4 +63,7 @@ private:
 	class AWeaponBaseActor* EquippedWeapon;
 	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
 	FTransform LeftHandTransform;
+
+	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
+	ETurningInPlace TurningInPlace;
 };

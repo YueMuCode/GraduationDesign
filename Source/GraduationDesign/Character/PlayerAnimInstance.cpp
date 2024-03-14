@@ -67,4 +67,6 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		LeftHandTransform.SetLocation(OutPosition);
 		LeftHandTransform.SetRotation(FQuat(OutRotation));
 	}
+
+	TurningInPlace=PlayerCharacter->GetTurningInPlace();
 }

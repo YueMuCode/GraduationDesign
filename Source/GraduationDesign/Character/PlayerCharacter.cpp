@@ -42,6 +42,9 @@ APlayerCharacter::APlayerCharacter()
 	//解决相机与人物碰撞的问题
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
+
+	//原地转身
+	TurningInPlace=ETurningInPlace::ETIP_NotTurning;
 }
 
 void APlayerCharacter::BeginPlay()
@@ -181,13 +184,14 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 		// }
 		bUseControllerRotationYaw=false;
 		//TurnInPlace(DeltaTime);
+		TurnInPlace(DeltaTime);
 	}
 	if(Speed>0.f||bIsAir)
 	{
 		StartingAimRotation=FRotator(0.f,GetBaseAimRotation().Yaw,0.f);
 		AO_Yaw=0.f;
 		bUseControllerRotationYaw=true;
-		//TurningInPlace=ETurningInPlace::ETIP_NotTurning;
+		TurningInPlace=ETurningInPlace::ETIP_NotTurning;
 	}
 
 	//这里源码的处理方式与我们的代码有点错误，需要进行修正，不然网络多人传值不正确,原因在于，源码用了无符号的形式存储pitch
@@ -240,6 +244,18 @@ void APlayerCharacter::OnRep_OverLapWeapon(AWeaponBaseActor* LastWeapon)//当客
 		LastWeapon->ShowPickUpWidget(false);//离开
 	}
 
+}
+
+void APlayerCharacter::TurnInPlace(float DeltaTime)
+{
+	if(AO_Yaw>=90.f)
+	{
+		TurningInPlace=ETurningInPlace::ETIP_Right;
+	}
+	else if(AO_Yaw<-90.f)
+	{
+		TurningInPlace=ETurningInPlace::ETIP_Left;
+	}
 }
 
 void APlayerCharacter::ServerEquipButtonPressed_Implementation()

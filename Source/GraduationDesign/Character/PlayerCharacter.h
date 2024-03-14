@@ -6,6 +6,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "GraduationDesign/PlayerComponent/CombatComponent.h"
+#include "GraduationDesign/TypeFiles/TurningInPlace.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -30,6 +31,8 @@ public:
 	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
 	FORCEINLINE float GetAO_Pitch()const {return AO_Pitch;}
 	AWeaponBaseActor* GetEquippedWeapon();
+
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const {return TurningInPlace;}
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -74,4 +77,7 @@ private:
 	float AO_Yaw;
 	float AO_Pitch;
 	FRotator StartingAimRotation;
+
+	ETurningInPlace TurningInPlace;
+	void TurnInPlace(float DeltaTime);
 };
