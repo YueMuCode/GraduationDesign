@@ -33,6 +33,9 @@ public:
 	AWeaponBaseActor* GetEquippedWeapon();
 
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const {return TurningInPlace;}
+
+	//播放蒙太奇
+	void PlayFireMontage(bool bAiming);
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -43,6 +46,8 @@ protected:
 	void AimButtonPressed();
 	void AimButtonReleased();
 	virtual void Jump() override;
+	void FireButtonPressed();
+	void FireButtonReleased();
 	
 	void AimOffset(float DeltaTime);
 
@@ -82,4 +87,7 @@ private:
 
 	ETurningInPlace TurningInPlace;
 	void TurnInPlace(float DeltaTime);
+
+	UPROPERTY(EditAnywhere,Category=Combat)
+	UAnimMontage* FireWeaponMontage;
 };

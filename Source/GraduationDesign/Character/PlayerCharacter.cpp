@@ -81,6 +81,9 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction("Aim",IE_Pressed,this,&ThisClass::AimButtonPressed);
 	PlayerInputComponent->BindAction("Aim",IE_Released,this,&ThisClass::AimButtonReleased);
+
+	PlayerInputComponent->BindAction("Fire",IE_Pressed,this,&ThisClass::FireButtonPressed);
+	PlayerInputComponent->BindAction("Fire",IE_Released,this,&ThisClass::FireButtonReleased);
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -102,6 +105,21 @@ AWeaponBaseActor* APlayerCharacter::GetEquippedWeapon()
 {
 	if(CombatComponent==nullptr)return nullptr;
 	return CombatComponent->EquippedWeapon;
+}
+
+//播放蒙太奇片段
+void APlayerCharacter::PlayFireMontage(bool bAiming)
+{
+	if(CombatComponent==nullptr||CombatComponent->EquippedWeapon==nullptr)return;
+
+	UAnimInstance* AnimInstance=GetMesh()->GetAnimInstance();
+	if(AnimInstance&&FireWeaponMontage)
+	{
+		AnimInstance->Montage_Play(FireWeaponMontage);
+		FName SectionName;
+		SectionName=bAiming?FName("RifleAim"):FName("RifleHip");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
 }
 
 void APlayerCharacter::MoveForward(float value)
@@ -171,7 +189,6 @@ void APlayerCharacter::AimButtonReleased()
 		CombatComponent->SetAiming(false);
 	}
 }
-
 void APlayerCharacter::Jump()
 {
 
@@ -184,6 +201,23 @@ void APlayerCharacter::Jump()
 		Super::Jump();
 	}
 }
+
+void APlayerCharacter::FireButtonPressed()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->FireButtonPressed(true);
+	}
+}
+
+void APlayerCharacter::FireButtonReleased()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->FireButtonPressed(false);
+	}
+}
+
 
 void APlayerCharacter::AimOffset(float DeltaTime)
 {

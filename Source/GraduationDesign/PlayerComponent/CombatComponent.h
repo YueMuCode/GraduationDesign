@@ -29,6 +29,8 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+
+	void FireButtonPressed(bool bPressed);
 private:
 	 APlayerCharacter* Character;
 
@@ -42,7 +44,8 @@ private:
 	float BaseWalkSpeed;
 	UPROPERTY(EditAnywhere)
 	float AimWalkSpeed;
-	
+
+	bool bFireButtonPressed;
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	
