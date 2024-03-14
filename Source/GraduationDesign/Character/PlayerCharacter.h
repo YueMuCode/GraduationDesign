@@ -6,7 +6,6 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "GraduationDesign/PlayerComponent/CombatComponent.h"
-#include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -28,6 +27,8 @@ public:
 	void SetOverlapWeapon(AWeaponBaseActor*Weapon);
 	bool IsWeaponEquipped();
 	bool IsAiming();
+	FORCEINLINE float GetAO_Yaw() const {return AO_Yaw;}
+	FORCEINLINE float GetAO_Pitch()const {return AO_Pitch;}
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -37,6 +38,8 @@ protected:
 	void CrouchButtonPressed();
 	void AimButtonPressed();
 	void AimButtonReleased();
+
+	void AimOffset(float DeltaTime);
 
 private:
 
@@ -65,4 +68,9 @@ private:
 	//RPC
 	UFUNCTION(Server,Reliable)
 	void ServerEquipButtonPressed();//客户端调用，服务器执行
+
+
+	float AO_Yaw;
+	float AO_Pitch;
+	FRotator StartingAimRotation;
 };
