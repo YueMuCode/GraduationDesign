@@ -45,6 +45,10 @@ APlayerCharacter::APlayerCharacter()
 
 	//原地转身
 	TurningInPlace=ETurningInPlace::ETIP_NotTurning;
+
+	//设置网络的更新评率
+	NetUpdateFrequency=66.f;
+	MinNetUpdateFrequency=33.f;
 }
 
 void APlayerCharacter::BeginPlay()
