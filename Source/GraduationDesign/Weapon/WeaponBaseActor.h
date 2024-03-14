@@ -47,12 +47,11 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickUpWidget(bool bShowWidget);
-
-
-public:
 	void SetWeaponState(EWeaponState State);//内联函数它将函数的代码插入到调用函数的地方，而不是跳转到函数的地址执行。
 	FORCEINLINE USphereComponent* GetAreaSphere() const {return AreaSphere;}
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh()const {return WeaponMesh;}
+	//武器开火
+	void Fire();
 protected:
 
 private:
@@ -74,5 +73,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_WeaponState();
+
+	//武器开火
+	UPROPERTY(EditAnywhere,Category="武器组件")
+	UAnimationAsset* FireAnimation;//?
 
 };

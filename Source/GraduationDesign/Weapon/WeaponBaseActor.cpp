@@ -105,6 +105,14 @@ void AWeaponBaseActor::SetWeaponState(EWeaponState State)
 		break;
 	}
 }
+//武器开火动画
+void AWeaponBaseActor::Fire()
+{
+	if(FireAnimation)
+	{
+		WeaponMesh->PlayAnimation(FireAnimation,false);
+	}
+}
 
 void AWeaponBaseActor::OnRep_WeaponState()
 {
