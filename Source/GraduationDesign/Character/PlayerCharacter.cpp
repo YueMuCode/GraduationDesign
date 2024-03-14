@@ -49,6 +49,9 @@ APlayerCharacter::APlayerCharacter()
 	//设置网络的更新评率
 	NetUpdateFrequency=66.f;
 	MinNetUpdateFrequency=33.f;
+
+	//转身速度
+	//GetCharacterMovement()->RotationRate=FRotator(0.f,0.f,850.f);
 }
 
 void APlayerCharacter::BeginPlay()
@@ -72,7 +75,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("Turn",this,&ThisClass::Turn);
 	PlayerInputComponent->BindAxis("LookUp",this,&ThisClass::LookUp);
 	
-	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump",IE_Pressed,this,&APlayerCharacter::Jump);
 	PlayerInputComponent->BindAction("Equip",IE_Pressed,this,&ThisClass::EquipButtonPressed);
 	PlayerInputComponent->BindAction("Crouch",IE_Pressed,this,&ThisClass::CrouchButtonPressed);
 
@@ -166,6 +169,19 @@ void APlayerCharacter::AimButtonReleased()
 	if(CombatComponent)
 	{
 		CombatComponent->SetAiming(false);
+	}
+}
+
+void APlayerCharacter::Jump()
+{
+
+	if(bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Super::Jump();
 	}
 }
 
