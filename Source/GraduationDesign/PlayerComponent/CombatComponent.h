@@ -31,6 +31,14 @@ protected:
 	void OnRep_EquippedWeapon();
 
 	void FireButtonPressed(bool bPressed);
+
+	//实现开火动画的RPC
+	UFUNCTION(Server,Reliable)
+	void ServerFire();
+
+	//多播RPC实现开火动画
+	UFUNCTION(NetMulticast,Reliable)
+	void MulticastFire();
 private:
 	 APlayerCharacter* Character;
 

@@ -57,13 +57,27 @@ void UCombatComponent::OnRep_EquippedWeapon()
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed=bPressed;
+	if(bFireButtonPressed)
+	{
+		ServerFire();
+	}
+	
+}
+//在服务器上实现多播RPC
+void UCombatComponent::MulticastFire_Implementation()
+{
 	if(EquippedWeapon==nullptr)return;
-	if(Character&&bFireButtonPressed)
+	if(Character)
 	{
 		Character->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire();//播放武器的开火动画
 	}
-	
+}
+
+//实现开火动画RPC
+void UCombatComponent::ServerFire_Implementation()
+{
+	MulticastFire();
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
