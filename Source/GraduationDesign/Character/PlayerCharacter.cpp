@@ -4,6 +4,7 @@
 #include "PlayerCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -36,6 +37,10 @@ APlayerCharacter::APlayerCharacter()
 
 
 	GetCharacterMovement()->NavAgentProps.bCanCrouch=true;//开启了运动系统中的蹲伏功能
+
+	//解决相机与人物碰撞的问题
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 }
 
 void APlayerCharacter::BeginPlay()
