@@ -88,6 +88,12 @@ void APlayerCharacter::PostInitializeComponents()
 	}
 }
 
+AWeaponBaseActor* APlayerCharacter::GetEquippedWeapon()
+{
+	if(CombatComponent==nullptr)return nullptr;
+	return CombatComponent->EquippedWeapon;
+}
+
 void APlayerCharacter::MoveForward(float value)
 {
 	if(Controller!=nullptr&&value!=0.f)

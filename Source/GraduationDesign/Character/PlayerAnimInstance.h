@@ -56,4 +56,10 @@ private:
 	float AO_Yaw;
 	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
 	float AO_Pitch;
+
+	//使用IK让左手贴合武器
+
+	class AWeaponBaseActor* EquippedWeapon;
+	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
+	FTransform LeftHandTransform;
 };

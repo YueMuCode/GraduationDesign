@@ -5,6 +5,7 @@
 
 #include "PlayerCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Kismet/KismetMathLibrary.h"
 
 void UPlayerAnimInstance::NativeInitializeAnimation()
@@ -54,4 +55,16 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	AO_Yaw=PlayerCharacter->GetAO_Yaw();
 	AO_Pitch=PlayerCharacter->GetAO_Pitch();
+
+	//IK武器左手
+	EquippedWeapon=PlayerCharacter->GetEquippedWeapon();
+	if(bWeaponEquipped&&EquippedWeapon&&EquippedWeapon->GetWeaponMesh()&&PlayerCharacter->GetMesh())
+	{
+		LeftHandTransform=EquippedWeapon->GetWeaponMesh()->GetSocketTransform(FName("LeftHandSocket"),RTS_World);
+		FVector OutPosition;
+		FRotator OutRotation;
+		PlayerCharacter->GetMesh()->TransformToBoneSpace(FName("hand_r"),LeftHandTransform.GetLocation(),FRotator::ZeroRotator,OutPosition,OutRotation);
+		LeftHandTransform.SetLocation(OutPosition);
+		LeftHandTransform.SetRotation(FQuat(OutRotation));
+	}
 }
