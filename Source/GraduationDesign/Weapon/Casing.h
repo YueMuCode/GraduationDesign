@@ -17,9 +17,18 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent*HitComp,AActor*OtherActor,UPrimitiveComponent*OtherComp,FVector NormalImpulse,const FHitResult& Hit);
 private:
 	//子弹壳的静态网格体
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent*CasingMesh;
 
+	//子弹壳物理特性
+	UPROPERTY(EditAnywhere)
+	float ShellEjectionimpulse;
+
+	//子弹壳落地声音
+	UPROPERTY(EditAnywhere)
+	class USoundCue* ShellSound;
 };
