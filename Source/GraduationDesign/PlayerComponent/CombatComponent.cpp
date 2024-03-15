@@ -7,11 +7,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
-
+#define TRACE_LENGTH 80000;
 UCombatComponent::UCombatComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 	
 }
 
@@ -23,6 +24,15 @@ void UCombatComponent::BeginPlay()
 		BaseWalkSpeed=Character->GetCharacterMovement()->MaxWalkSpeed;
 		AimWalkSpeed=BaseWalkSpeed/2.f;
 	}
+}
+
+void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//发出射线
+	FHitResult HitResult;
+	TraceUnderCrosshairs(HitResult);
+
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)
@@ -63,6 +73,53 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	}
 	
 }
+
+//射击射线
+void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
+{
+	//获取视口的大小
+	FVector2D ViewportSize;
+	if(GEngine&&GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+	//获取视口屏幕的中心
+	FVector2D CrosshairLocation(ViewportSize.X/2.f,ViewportSize.Y/2.f);
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+	//一下以下一大堆数学计算
+	bool bScreenToWorld=  UGameplayStatics::DeprojectScreenToWorld(
+		UGameplayStatics::GetPlayerController(this,0),
+		CrosshairLocation,
+		CrosshairWorldPosition,
+		CrosshairWorldDirection
+	);
+
+	if(bScreenToWorld)
+	{
+		FVector Start=CrosshairWorldPosition;
+		FVector End=Start+CrosshairWorldDirection*TRACE_LENGTH;
+	
+		GetWorld()->LineTraceSingleByChannel(
+			TraceHitResult,
+			Start,
+			End,
+			ECC_Visibility
+		);
+		//没有碰撞到东西
+		if(!TraceHitResult.bBlockingHit)
+		{
+			TraceHitResult.ImpactPoint=End;
+			//HitTarget=End;
+		}
+		else
+		{
+			//HitTarget=TraceHitResult.ImpactPoint;
+			DrawDebugSphere(GetWorld(),TraceHitResult.ImpactPoint,12.f,12,FColor::Red);
+		}
+	}
+}
+
 //在服务器上实现多播RPC
 void UCombatComponent::MulticastFire_Implementation()
 {
@@ -80,11 +137,7 @@ void UCombatComponent::ServerFire_Implementation()
 	MulticastFire();
 }
 
-void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-}
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

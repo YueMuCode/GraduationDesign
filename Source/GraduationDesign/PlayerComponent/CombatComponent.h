@@ -39,6 +39,9 @@ protected:
 	//多播RPC实现开火动画
 	UFUNCTION(NetMulticast,Reliable)
 	void MulticastFire();
+
+	//射击瞄准射线
+	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 private:
 	 APlayerCharacter* Character;
 
