@@ -89,6 +89,11 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 		FHitResult HitResult;
 		TraceUnderCrosshairs(HitResult);
 		ServerFire(HitResult.ImpactPoint);
+
+		if(EquippedWeapon)
+		{
+			CrosshairShootingFactor=1.f;
+		}
 	}
 	
 }
@@ -126,16 +131,16 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 			ECC_Visibility
 		);
 		//没有碰撞到东西
-		// if(!TraceHitResult.bBlockingHit)
-		// {
-		// 	TraceHitResult.ImpactPoint=End;
-		// 	HitTarget=End;
-		// }
-		// else
-		// {
-		// 	HitTarget=TraceHitResult.ImpactPoint;
+		 if(!TraceHitResult.bBlockingHit)
+		 {
+		 	TraceHitResult.ImpactPoint=End;
+		 	HitTarget=End;
+		 }
+		 else
+		 {
+		 	HitTarget=TraceHitResult.ImpactPoint;
 			//DrawDebugSphere(GetWorld(),TraceHitResult.ImpactPoint,12.f,12,FColor::Red);
-		//}
+		}
 	}
 }
 
@@ -182,7 +187,18 @@ void UCombatComponent::SetHUDCrossairs(float DeltaTime)
 			{
 				CrosshairInAirFactor=FMath::FInterpTo(CrosshairInAirFactor,0.f,DeltaTime,30.f);
 			}
-			HUDPackage.CrosshairSpread=CrosshairVelocityFactor+CrosshairInAirFactor;
+			if(bAiming)
+			{
+				CrosshairInAimFactor=FMath::FInterpTo(CrosshairInAimFactor,0.58f,DeltaTime,30.f);
+			}
+			else
+			{
+				CrosshairInAimFactor=FMath::FInterpTo(CrosshairInAimFactor,0.f,DeltaTime,30.f);
+			}
+
+			CrosshairShootingFactor=FMath::FInterpTo(CrosshairShootingFactor,0.f,DeltaTime,20.f);
+			
+			HUDPackage.CrosshairSpread=CrosshairVelocityFactor+CrosshairInAirFactor-CrosshairInAimFactor+0.5f+CrosshairShootingFactor;
 			HUD->SetHUDPackage(HUDPackage);
 		}
 	}

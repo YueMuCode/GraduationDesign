@@ -71,7 +71,8 @@ private:
 	//计算准心抖动
 	float CrosshairVelocityFactor;
 	float CrosshairInAirFactor;
-
+	float CrosshairInAimFactor;
+	float CrosshairShootingFactor;
 	//调整枪口
 	FVector HitTarget;
 
