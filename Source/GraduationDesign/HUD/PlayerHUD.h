@@ -34,6 +34,8 @@ public:
 
 	FORCEINLINE void SetHUDPackage(const FHUDPackage&Package){HUDPackage=Package;}
 private:
+	//绘制武器准心
 	FHUDPackage HUDPackage;
-	
+
+	void DrawCrosshair(UTexture2D* Texture,FVector2D ViewportCenter);
 };
