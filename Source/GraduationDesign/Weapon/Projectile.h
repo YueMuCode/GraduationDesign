@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Projectile.generated.h"
 
 UCLASS()
@@ -25,4 +26,10 @@ private:
 	//子弹运动组件
 	UPROPERTY(VisibleAnywhere)
 	class UProjectileMovementComponent* ProjectileMovementComponent;
+
+	//子弹尾迹粒子
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* Tracer;
+
+	UParticleSystemComponent* TracerComponent;
 };

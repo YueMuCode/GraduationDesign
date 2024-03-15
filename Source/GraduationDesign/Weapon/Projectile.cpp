@@ -5,10 +5,13 @@
 
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AProjectile::AProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	//让子弹可以复制
+	bReplicates=true;
 	CollisionBox=CreateDefaultSubobject<UBoxComponent>(TEXT("碰撞盒组件"));
 	SetRootComponent(CollisionBox);
 	//下面的碰撞设置
@@ -21,12 +24,19 @@ AProjectile::AProjectile()
 	//创建运动组件
 	ProjectileMovementComponent=CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("运动组件"));
 	ProjectileMovementComponent->bRotationFollowsVelocity=true;
+
+	
 	
 }
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	//生成子弹尾迹
+	if(Tracer)
+	{
+		TracerComponent=UGameplayStatics::SpawnEmitterAttached(
+			Tracer,CollisionBox,FName(),GetActorLocation(),GetActorRotation(),EAttachLocation::KeepWorldPosition);
+	}
 }
 
 void AProjectile::Tick(float DeltaTime)
