@@ -18,8 +18,11 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	//碰撞盒
 	UPROPERTY(EditAnywhere)
 	class UBoxComponent*CollisionBox;
 	
-
+	//子弹运动组件
+	UPROPERTY(VisibleAnywhere)
+	class UProjectileMovementComponent* ProjectileMovementComponent;
 };
