@@ -38,12 +38,16 @@ public:
 
 	//播放蒙太奇
 	void PlayFireMontage(bool bAiming);
-
+	void PlayHitReactMontage();
 	//调整枪口
 	FVector GetHitTarget()const;
 
 	//瞄准视野
 	FORCEINLINE UCameraComponent*GetFollowCamera()const {return FollowCamera;}
+
+	//服务器上多播受伤蒙太奇
+	UFUNCTION(NetMulticast,Unreliable)
+	void MulticastHit();
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -96,9 +100,15 @@ private:
 	ETurningInPlace TurningInPlace;
 	void TurnInPlace(float DeltaTime);
 
+	//蒙太奇
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UAnimMontage* FireWeaponMontage;
 
+	//受伤动画
+	UPROPERTY(EditAnywhere,Category=Combat)
+	UAnimMontage* HitReactMontage;
+	
+	
 	//防止相机怼到墙上丢失视野
 	void HideCameraIfCharacterClose();
 	UPROPERTY(EditAnywhere)

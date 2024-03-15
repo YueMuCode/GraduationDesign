@@ -43,6 +43,7 @@ APlayerCharacter::APlayerCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
+	GetMesh()->SetCollisionObjectType(ECC_EngineTraceChannel1);
 	//原地转身
 	TurningInPlace=ETurningInPlace::ETIP_NotTurning;
 
@@ -122,6 +123,20 @@ void APlayerCharacter::PlayFireMontage(bool bAiming)
 		AnimInstance->Montage_JumpToSection(SectionName);
 	}
 }
+
+void APlayerCharacter::PlayHitReactMontage()
+{
+	if(CombatComponent==nullptr||CombatComponent->EquippedWeapon==nullptr)return;
+
+	UAnimInstance* AnimInstance=GetMesh()->GetAnimInstance();
+	if(AnimInstance&&HitReactMontage)
+	{
+		AnimInstance->Montage_Play(HitReactMontage);
+		FName SectionName("FromFront");
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
+
 
 FVector APlayerCharacter::GetHitTarget() const
 {
@@ -326,6 +341,12 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 			StartingAimRotation=FRotator(0.f,GetBaseAimRotation().Yaw,0.f);
 		}
 	}
+}
+
+//多播受伤蒙太奇
+void APlayerCharacter::MulticastHit_Implementation()
+{
+	PlayHitReactMontage();
 }
 
 void APlayerCharacter::HideCameraIfCharacterClose()

@@ -5,8 +5,10 @@
 
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "GraduationDesign/Character/PlayerCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
+#include "GraduationDesign/GraduationDesign.h"
 
 AProjectile::AProjectile()
 {
@@ -21,6 +23,8 @@ AProjectile::AProjectile()
 	CollisionBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionBox->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
 	CollisionBox->SetCollisionResponseToChannel(ECC_WorldStatic,ECR_Block);
+	//确保子弹能命中玩家
+	CollisionBox->SetCollisionResponseToChannel(ECC_EngineTraceChannel1,ECR_Block);
 
 	//创建运动组件
 	ProjectileMovementComponent=CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("运动组件"));
@@ -56,6 +60,13 @@ void AProjectile::Tick(float DeltaTime)
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
+	//播放受伤的蒙太奇
+	APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(OtherActor);
+	if(PlayerCharacter)
+	{
+		PlayerCharacter->MulticastHit();
+	}
+
 	//摧毁
 	Destroy();//destroy函数底层内置了网络通信，可以直接使用。最终会在底层调用到destroyed
 }
@@ -70,6 +81,7 @@ void AProjectile::Destroyed()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation());
 	}
+	
 }
 
 
