@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Camera/CameraComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "GraduationDesign/PlayerComponent/CombatComponent.h"
@@ -39,6 +40,9 @@ public:
 
 	//调整枪口
 	FVector GetHitTarget()const;
+
+	//瞄准视野
+	FORCEINLINE UCameraComponent*GetFollowCamera()const {return FollowCamera;}
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);

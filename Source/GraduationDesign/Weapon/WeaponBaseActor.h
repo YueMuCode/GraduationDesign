@@ -68,6 +68,14 @@ public:
 
 	UPROPERTY(EditAnywhere,Category="Crosshairs")
 	UTexture2D* CrosshairsBottom;
+
+	//瞄准视野放大
+	UPROPERTY(EditAnywhere)
+	float ZoomedFOV=30.f;
+	UPROPERTY(EditAnywhere)
+	float ZoomInterSpeed=20.f;
+	FORCEINLINE float GetZoomedFOV() const {return ZoomedFOV;}
+	FORCEINLINE float GetZoomInterSpeed() const {return ZoomInterSpeed;}
 protected:
 
 private:

@@ -23,6 +23,13 @@ void UCombatComponent::BeginPlay()
 	{
 		BaseWalkSpeed=Character->GetCharacterMovement()->MaxWalkSpeed;
 		AimWalkSpeed=BaseWalkSpeed/2.f;
+
+		//瞄准视角
+		if(Character->GetFollowCamera())
+		{
+			DefaultFOV=Character->GetFollowCamera()->FieldOfView;//设置视角
+			CurrentFOV=DefaultFOV;
+		}
 	}
 }
 
@@ -37,6 +44,9 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		FHitResult HitResult;
 		TraceUnderCrosshairs(HitResult);
 		HitTarget=HitResult.ImpactPoint;
+
+		SetHUDCrossairs(DeltaTime);
+		InterpFOV(DeltaTime);
 	}
 
 }
@@ -202,6 +212,25 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(UCombatComponent,EquippedWeapon);//EquippedWeapon进行复制
 	DOREPLIFETIME(UCombatComponent,bAiming);
+}
+//瞄准视野变大
+void UCombatComponent::InterpFOV(float DeltaTime)
+{
+	if(EquippedWeapon==nullptr)return ;
+	if(bAiming)
+	{
+		//利用插值函数缓慢放大视角
+		CurrentFOV=FMath::FInterpTo(CurrentFOV,EquippedWeapon->GetZoomedFOV(),DeltaTime,EquippedWeapon->GetZoomInterSpeed());
+		
+	}
+	else
+	{
+		 CurrentFOV=FMath::FInterpTo(CurrentFOV,DefaultFOV,DeltaTime,ZoomInterSpeed);
+	}
+	if(Character&&Character->GetFollowCamera())
+	{
+		Character->GetFollowCamera()->SetFieldOfView(CurrentFOV);
+	}
 }
 
 void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)

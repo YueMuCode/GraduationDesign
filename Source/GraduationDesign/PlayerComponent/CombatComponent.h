@@ -74,6 +74,17 @@ private:
 
 	//调整枪口
 	FVector HitTarget;
+
+	//瞄准视野变大
+	float DefaultFOV;
+
+	UPROPERTY(EditAnywhere,Category=Combat)
+	float ZoomedFOV=30.f;
+	UPROPERTY(EditAnywhere,Category=Combat)
+	float ZoomInterSpeed=20.f;
+	UPROPERTY(EditAnywhere,Category=Combat)
+	float CurrentFOV;
+	void InterpFOV(float DeltaTime);
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	
