@@ -3,7 +3,9 @@
 
 #include "WeaponBaseActor.h"
 
+#include "Casing.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
 #include "Net/UnrealNetwork.h"
 
@@ -105,14 +107,7 @@ void AWeaponBaseActor::SetWeaponState(EWeaponState State)
 		break;
 	}
 }
-//武器开火动画
-void AWeaponBaseActor::Fire(const FVector& HitTarget)
-{
-	if(FireAnimation)
-	{
-		WeaponMesh->PlayAnimation(FireAnimation,false);
-	}
-}
+
 
 void AWeaponBaseActor::OnRep_WeaponState()
 {
@@ -123,4 +118,25 @@ void AWeaponBaseActor::OnRep_WeaponState()
 		break;
 	}
 }
-
+//武器开火动画
+void AWeaponBaseActor::Fire(const FVector& HitTarget)
+{
+	if(FireAnimation)
+	{
+		WeaponMesh->PlayAnimation(FireAnimation,false);
+	}
+	//生成子弹壳
+	if(CasingClass)
+	{
+		const USkeletalMeshSocket* AmmoEjectSocket =WeaponMesh->GetSocketByName(FName("AmmoEject"));
+		if(AmmoEjectSocket)
+		{
+			FTransform SocketTransform=AmmoEjectSocket->GetSocketTransform(WeaponMesh);
+			UWorld* World=GetWorld();
+			if(World)
+			{
+				World->SpawnActor<ACasing>(CasingClass,SocketTransform.GetLocation(),SocketTransform.GetRotation().Rotator());
+			}
+		}
+	}
+}

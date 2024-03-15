@@ -78,4 +78,7 @@ private:
 	UPROPERTY(EditAnywhere,Category="武器组件")
 	UAnimationAsset* FireAnimation;//?
 
+	//子弹壳
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ACasing> CasingClass;
 };
