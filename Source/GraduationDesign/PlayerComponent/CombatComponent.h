@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "GraduationDesign/HUD/PlayerHUD.h"
+#include "GraduationDesign/PlayerController/MyPlayerController.h"
 #include "CombatComponent.generated.h"
 
 
@@ -42,8 +44,11 @@ protected:
 
 	//射击瞄准射线
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
+
+	//绘制武器准心
+	void SetHUDCrossairs(float delta);
 private:
-	 APlayerCharacter* Character;
+	APlayerCharacter* Character;
 
 	UPROPERTY(ReplicatedUsing=OnRep_EquippedWeapon)
 	class AWeaponBaseActor* EquippedWeapon;
@@ -60,6 +65,10 @@ private:
 
 	//命中目标
 	FVector HitTarget;
+
+	//绘制武器准心
+	AMyPlayerController* Controller;
+	APlayerHUD* HUD;
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	

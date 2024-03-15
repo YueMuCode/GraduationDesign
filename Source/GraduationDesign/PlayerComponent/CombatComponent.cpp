@@ -29,7 +29,7 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	SetHUDCrossairs(DeltaTime);
 
 }
 
@@ -118,6 +118,40 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		// 	HitTarget=TraceHitResult.ImpactPoint;
 			//DrawDebugSphere(GetWorld(),TraceHitResult.ImpactPoint,12.f,12,FColor::Red);
 		//}
+	}
+}
+
+//绘制武器准心
+void UCombatComponent::SetHUDCrossairs(float delta)
+{
+	if(Character==nullptr||Character->Controller==nullptr)return;
+	Controller=Controller==nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
+	if(Controller)
+	{
+		HUD=HUD==nullptr?Cast<APlayerHUD>(Controller->GetHUD()):HUD;
+		if(HUD)
+		{
+			FHUDPackage HUDPackage;
+			if(EquippedWeapon)
+			{
+				HUDPackage.CrosshairsCenter=EquippedWeapon->CrosshairCenter;
+				HUDPackage.CrosshairsLeft=EquippedWeapon->CrosshairsLeft;
+				HUDPackage.CrosshairsRight=EquippedWeapon->CrosshairsRight;
+				HUDPackage.CrosshairsTop=EquippedWeapon->CrosshairsTop;
+				HUDPackage.CrosshairsBottom=EquippedWeapon->CrosshairsBottom;
+				
+			}
+			else
+			{
+				HUDPackage.CrosshairsCenter=nullptr;
+				HUDPackage.CrosshairsLeft=nullptr;
+				HUDPackage.CrosshairsRight=nullptr;
+				HUDPackage.CrosshairsTop=nullptr;
+				HUDPackage.CrosshairsBottom=nullptr;
+				
+			}
+			HUD->SetHUDPackage(HUDPackage);
+		}
 	}
 }
 

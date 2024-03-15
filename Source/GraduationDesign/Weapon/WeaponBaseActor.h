@@ -52,6 +52,22 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh()const {return WeaponMesh;}
 	//武器开火
 	virtual void Fire(const FVector& HitTarget);
+
+	//绘制准心
+	UPROPERTY(EditAnywhere,Category="Crosshairs")
+	UTexture2D* CrosshairCenter;
+
+	UPROPERTY(EditAnywhere,Category="Crosshairs")
+	UTexture2D* CrosshairsLeft;
+
+	UPROPERTY(EditAnywhere,Category="Crosshairs")
+	UTexture2D* CrosshairsRight;
+
+	UPROPERTY(EditAnywhere,Category="Crosshairs")
+	UTexture2D* CrosshairsTop;
+
+	UPROPERTY(EditAnywhere,Category="Crosshairs")
+	UTexture2D* CrosshairsBottom;
 protected:
 
 private:
@@ -81,4 +97,6 @@ private:
 	//子弹壳
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACasing> CasingClass;
+
+	
 };
