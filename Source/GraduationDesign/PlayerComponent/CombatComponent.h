@@ -34,11 +34,11 @@ protected:
 
 	//实现开火动画的RPC
 	UFUNCTION(Server,Reliable)
-	void ServerFire();
+	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
 	//多播RPC实现开火动画
 	UFUNCTION(NetMulticast,Reliable)
-	void MulticastFire();
+	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
 
 	//射击瞄准射线
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);

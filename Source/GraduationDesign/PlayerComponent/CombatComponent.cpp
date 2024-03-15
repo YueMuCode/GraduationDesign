@@ -29,9 +29,7 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	//发出射线
-	FHitResult HitResult;
-	TraceUnderCrosshairs(HitResult);
+
 
 }
 
@@ -69,7 +67,10 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	bFireButtonPressed=bPressed;
 	if(bFireButtonPressed)
 	{
-		ServerFire();
+		//发出射线
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		ServerFire(HitResult.ImpactPoint);
 	}
 	
 }
@@ -107,34 +108,34 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 			ECC_Visibility
 		);
 		//没有碰撞到东西
-		if(!TraceHitResult.bBlockingHit)
-		{
-			TraceHitResult.ImpactPoint=End;
-			HitTarget=End;
-		}
-		else
-		{
-			HitTarget=TraceHitResult.ImpactPoint;
-			DrawDebugSphere(GetWorld(),TraceHitResult.ImpactPoint,12.f,12,FColor::Red);
-		}
+		// if(!TraceHitResult.bBlockingHit)
+		// {
+		// 	TraceHitResult.ImpactPoint=End;
+		// 	HitTarget=End;
+		// }
+		// else
+		// {
+		// 	HitTarget=TraceHitResult.ImpactPoint;
+			//DrawDebugSphere(GetWorld(),TraceHitResult.ImpactPoint,12.f,12,FColor::Red);
+		//}
 	}
 }
 
 //在服务器上实现多播RPC
-void UCombatComponent::MulticastFire_Implementation()
+void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if(EquippedWeapon==nullptr)return;
 	if(Character)
 	{
 		Character->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire(HitTarget);//播放武器的开火动画
+		EquippedWeapon->Fire(TraceHitTarget);//播放武器的开火动画
 	}
 }
 
 //实现开火动画RPC
-void UCombatComponent::ServerFire_Implementation()
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	MulticastFire();
+	MulticastFire(TraceHitTarget);
 }
 
 
