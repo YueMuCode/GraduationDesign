@@ -6,6 +6,7 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 AProjectile::AProjectile()
 {
@@ -37,11 +38,38 @@ void AProjectile::BeginPlay()
 		TracerComponent=UGameplayStatics::SpawnEmitterAttached(
 			Tracer,CollisionBox,FName(),GetActorLocation(),GetActorRotation(),EAttachLocation::KeepWorldPosition);
 	}
+	//在服务器上处理
+	if(HasAuthority())
+	{
+		CollisionBox->OnComponentHit.AddDynamic(this,&AProjectile::OnHit);
+	}
 }
-
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
+
+
+
+//子弹命中结果处理
+void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	//摧毁
+	Destroy();//destroy函数底层内置了网络通信，可以直接使用。最终会在底层调用到destroyed
+}
+void AProjectile::Destroyed()
+{
+	Super::Destroyed();
+	if(ImpactParticles)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(),ImpactParticles,GetActorTransform());
+	}
+	if(ImpactSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this,ImpactSound,GetActorLocation());
+	}
+}
+
 

@@ -15,8 +15,13 @@ class GRADUATIONDESIGN_API AProjectile : public AActor
 public:	
 	AProjectile();
 	virtual void Tick(float DeltaTime) override;
+	virtual void Destroyed() override;
 protected:
 	virtual void BeginPlay() override;
+
+	//子弹命中后事件的处理
+	UFUNCTION()
+	virtual void OnHit(UPrimitiveComponent*HitComp,AActor*OtherActor,UPrimitiveComponent*OtherComp,FVector NormalImpulse,const FHitResult& Hit);
 
 private:
 	//碰撞盒
@@ -32,4 +37,10 @@ private:
 	UParticleSystem* Tracer;
 
 	UParticleSystemComponent* TracerComponent;
+
+	//子弹命中粒子特效、音效
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ImpactParticles;
+	UPROPERTY(EditAnywhere)
+	class USoundCue* ImpactSound;
 };
