@@ -66,4 +66,8 @@ private:
 
 	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
 	ETurningInPlace TurningInPlace;
+
+	//调整枪口位置
+	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
+	FRotator RightHandRotation;
 };

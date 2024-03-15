@@ -31,6 +31,14 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	SetHUDCrossairs(DeltaTime);
 
+	//调账枪口对准射线
+	if(Character&&Character->IsLocallyControlled())
+	{
+		FHitResult HitResult;
+		TraceUnderCrosshairs(HitResult);
+		HitTarget=HitResult.ImpactPoint;
+	}
+
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)

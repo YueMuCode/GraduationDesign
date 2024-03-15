@@ -122,6 +122,12 @@ void APlayerCharacter::PlayFireMontage(bool bAiming)
 	}
 }
 
+FVector APlayerCharacter::GetHitTarget() const
+{
+	if(CombatComponent==nullptr)return FVector();
+	return CombatComponent->HitTarget;
+}
+
 void APlayerCharacter::MoveForward(float value)
 {
 	if(Controller!=nullptr&&value!=0.f)

@@ -36,6 +36,9 @@ public:
 
 	//播放蒙太奇
 	void PlayFireMontage(bool bAiming);
+
+	//调整枪口
+	FVector GetHitTarget()const;
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);

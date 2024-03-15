@@ -63,8 +63,7 @@ private:
 
 	bool bFireButtonPressed;
 
-	//命中目标
-	FVector HitTarget;
+	
 
 	//绘制武器准心
 	AMyPlayerController* Controller;
@@ -72,6 +71,9 @@ private:
 	//计算准心抖动
 	float CrosshairVelocityFactor;
 	float CrosshairInAirFactor;
+
+	//调整枪口
+	FVector HitTarget;
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	
