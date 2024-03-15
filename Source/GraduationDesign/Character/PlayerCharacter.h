@@ -98,4 +98,9 @@ private:
 
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UAnimMontage* FireWeaponMontage;
+
+	//防止相机怼到墙上丢失视野
+	void HideCameraIfCharacterClose();
+	UPROPERTY(EditAnywhere)
+	float CameraThreshold=200.f;
 };
