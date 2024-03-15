@@ -24,6 +24,8 @@ public:
 
 	//准心抖动效果
 	float CrosshairSpread;
+	//武器准心颜色
+	FLinearColor CrosshairsColor;
 };
 
 UCLASS()
@@ -38,7 +40,7 @@ private:
 	//绘制武器准心
 	FHUDPackage HUDPackage;
 
-	void DrawCrosshair(UTexture2D* Texture,FVector2D ViewportCenter,FVector2D Spread);
+	void DrawCrosshair(UTexture2D* Texture,FVector2D ViewportCenter,FVector2D Spread,FLinearColor CrosshairsColor);
 
 	//准心抖动参数
 	UPROPERTY(EditAnywhere)

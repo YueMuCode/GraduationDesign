@@ -42,7 +42,7 @@ APlayerCharacter::APlayerCharacter()
 	//解决相机与人物碰撞的问题
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera,ECR_Ignore);
-
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility,ECR_Block);
 	//原地转身
 	TurningInPlace=ETurningInPlace::ETIP_NotTurning;
 

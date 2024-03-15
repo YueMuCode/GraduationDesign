@@ -6,6 +6,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
+#include "GraduationDesign/Interface/InterractWithCrosshairsInterface.h"
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -130,6 +131,15 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 			End,
 			ECC_Visibility
 		);
+		//使用接口检测，如果碰撞到的actor实现了这个接口
+		if(TraceHitResult.GetActor()&&TraceHitResult.GetActor()->Implements<UInterractWithCrosshairsInterface>() )
+		{
+			HUDPackage.CrosshairsColor=FLinearColor::Red;
+		}
+		else
+		{
+			HUDPackage.CrosshairsColor=FLinearColor::Green;
+		}
 		//没有碰撞到东西
 		 if(!TraceHitResult.bBlockingHit)
 		 {
@@ -154,7 +164,6 @@ void UCombatComponent::SetHUDCrossairs(float DeltaTime)
 		HUD=HUD==nullptr?Cast<APlayerHUD>(Controller->GetHUD()):HUD;
 		if(HUD)
 		{
-			FHUDPackage HUDPackage;
 			if(EquippedWeapon)
 			{
 				HUDPackage.CrosshairsCenter=EquippedWeapon->CrosshairCenter;

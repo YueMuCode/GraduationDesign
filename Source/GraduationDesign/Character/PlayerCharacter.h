@@ -6,12 +6,13 @@
 #include "Camera/CameraComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
+#include "GraduationDesign/Interface/InterractWithCrosshairsInterface.h"
 #include "GraduationDesign/PlayerComponent/CombatComponent.h"
 #include "GraduationDesign/TypeFiles/TurningInPlace.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
-class GRADUATIONDESIGN_API APlayerCharacter : public ACharacter
+class GRADUATIONDESIGN_API APlayerCharacter : public ACharacter,public IInterractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 

@@ -68,6 +68,7 @@ private:
 	//绘制武器准心
 	AMyPlayerController* Controller;
 	APlayerHUD* HUD;
+	FHUDPackage HUDPackage;
 	//计算准心抖动
 	float CrosshairVelocityFactor;
 	float CrosshairInAirFactor;
@@ -86,6 +87,8 @@ private:
 	UPROPERTY(EditAnywhere,Category=Combat)
 	float CurrentFOV;
 	void InterpFOV(float DeltaTime);
+
+
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	
