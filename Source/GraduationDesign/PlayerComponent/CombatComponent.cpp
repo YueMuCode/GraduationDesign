@@ -122,7 +122,7 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 }
 
 //绘制武器准心
-void UCombatComponent::SetHUDCrossairs(float delta)
+void UCombatComponent::SetHUDCrossairs(float DeltaTime)
 {
 	if(Character==nullptr||Character->Controller==nullptr)return;
 	Controller=Controller==nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
@@ -150,6 +150,21 @@ void UCombatComponent::SetHUDCrossairs(float delta)
 				HUDPackage.CrosshairsBottom=nullptr;
 				
 			}
+			//计算屏幕抖动
+			FVector2D walkSpeedRange(0.f,Character->GetCharacterMovement()->MaxWalkSpeed);
+			FVector2D VelocityMultiplierRange(0.f,1.f);
+			FVector Velocity=Character->GetVelocity();
+			Velocity.Z=0.f;
+			CrosshairVelocityFactor= FMath::GetMappedRangeValueUnclamped(walkSpeedRange,VelocityMultiplierRange,Velocity.Size());
+			if(Character->GetCharacterMovement()->IsFalling())
+			{
+				CrosshairInAirFactor=FMath::FInterpTo(CrosshairInAirFactor,2.25f,DeltaTime,2.25f);
+			}
+			else
+			{
+				CrosshairInAirFactor=FMath::FInterpTo(CrosshairInAirFactor,0.f,DeltaTime,30.f);
+			}
+			HUDPackage.CrosshairSpread=CrosshairVelocityFactor+CrosshairInAirFactor;
 			HUD->SetHUDPackage(HUDPackage);
 		}
 	}

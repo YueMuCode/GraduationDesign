@@ -69,6 +69,9 @@ private:
 	//绘制武器准心
 	AMyPlayerController* Controller;
 	APlayerHUD* HUD;
+	//计算准心抖动
+	float CrosshairVelocityFactor;
+	float CrosshairInAirFactor;
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	
