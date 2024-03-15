@@ -110,11 +110,11 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 		if(!TraceHitResult.bBlockingHit)
 		{
 			TraceHitResult.ImpactPoint=End;
-			//HitTarget=End;
+			HitTarget=End;
 		}
 		else
 		{
-			//HitTarget=TraceHitResult.ImpactPoint;
+			HitTarget=TraceHitResult.ImpactPoint;
 			DrawDebugSphere(GetWorld(),TraceHitResult.ImpactPoint,12.f,12,FColor::Red);
 		}
 	}
@@ -127,7 +127,7 @@ void UCombatComponent::MulticastFire_Implementation()
 	if(Character)
 	{
 		Character->PlayFireMontage(bAiming);
-		EquippedWeapon->Fire();//播放武器的开火动画
+		EquippedWeapon->Fire(HitTarget);//播放武器的开火动画
 	}
 }
 

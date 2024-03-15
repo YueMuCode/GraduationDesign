@@ -13,5 +13,11 @@ UCLASS()
 class GRADUATIONDESIGN_API AProjectileWeapon : public AWeaponBaseActor
 {
 	GENERATED_BODY()
-	
+	//开火
+public:
+	virtual void Fire(const FVector& HitTarget) override;
+private:
+	//生成子弹类
+	UPROPERTY(EditAnywhere)
+	TSubclassOf< class AProjectile> ProjectileClass;
 };

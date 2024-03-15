@@ -57,6 +57,9 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
+
+	//命中目标
+	FVector HitTarget;
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	

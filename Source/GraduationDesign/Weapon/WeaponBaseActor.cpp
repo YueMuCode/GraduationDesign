@@ -106,7 +106,7 @@ void AWeaponBaseActor::SetWeaponState(EWeaponState State)
 	}
 }
 //武器开火动画
-void AWeaponBaseActor::Fire()
+void AWeaponBaseActor::Fire(const FVector& HitTarget)
 {
 	if(FireAnimation)
 	{
