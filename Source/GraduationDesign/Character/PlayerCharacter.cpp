@@ -54,6 +54,9 @@ APlayerCharacter::APlayerCharacter()
 
 	//转身速度
 	//GetCharacterMovement()->RotationRate=FRotator(0.f,0.f,850.f);
+
+	//创建Timeline组件
+	DissolveTimeline=CreateDefaultSubobject<UTimelineComponent>("Timeline组件");
 }
 
 void APlayerCharacter::BeginPlay()
@@ -168,6 +171,17 @@ void APlayerCharacter::MulticastElim_Implementation()
 {
 	bElimmed=true;
 	PlayElimMontage();
+	//如果设置了材质，在这里创建动态材质
+	if(DissolveMaterialInstance)
+	{
+		DynamicDissolveMaterialInstance=UMaterialInstanceDynamic::Create(DissolveMaterialInstance,this);
+		GetMesh()->SetMaterial(0,DynamicDissolveMaterialInstance);//修改mesh的材质
+		GetMesh()->SetMaterial(1,DynamicDissolveMaterialInstance);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"),0.55f);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Glow"),200.f);
+	}
+	//开始动态修改材质的参数
+	StartDissolve();
 }
 
 FVector APlayerCharacter::GetHitTarget() const
@@ -212,6 +226,26 @@ void APlayerCharacter::ElimTimerFinished()
 	if(GameLevel1GameMode)
 	{
 		GameLevel1GameMode->RequestRespawn(this,Controller);
+	}
+}
+
+void APlayerCharacter::UpdateDissolveeMaterial(float DissolveValue)
+{
+	if(DynamicDissolveMaterialInstance)
+	{
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"),DissolveValue);
+	//	DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Grow"),0.55f);
+	}
+}
+
+//当播放轨道，就回调UpdateDissolveeMaterial，利用曲线插值慢慢实现值的变化效果
+void APlayerCharacter::StartDissolve()
+{
+	DissolveTrack.BindDynamic(this,&APlayerCharacter::APlayerCharacter::UpdateDissolveeMaterial);
+	if(DissolveCurve&&DissolveTimeline)
+	{
+		DissolveTimeline->AddInterpFloat(DissolveCurve,DissolveTrack);
+		DissolveTimeline->Play();
 	}
 }
 

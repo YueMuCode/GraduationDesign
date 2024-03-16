@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Camera/CameraComponent.h"
+#include "Components/TimelineComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/Character.h"
 #include "GraduationDesign/Interface/InterractWithCrosshairsInterface.h"
@@ -66,6 +67,28 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float ElimDelay=3.f;
 	void ElimTimerFinished();
+
+	//玩家死亡网格体溶解
+	//相当于timeline节点
+	UPROPERTY(VisibleAnywhere)
+	UTimelineComponent* DissolveTimeline;
+	
+	FOnTimelineFloat DissolveTrack;
+	UFUNCTION()
+	void UpdateDissolveeMaterial(float DissolveValue);
+	void StartDissolve();
+	//曲线
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* DissolveCurve;
+	//材质
+	//动态材质，我们可以修改他的值在运行的时候
+	UPROPERTY(VisibleAnywhere,Category=Elim)
+	UMaterialInstanceDynamic* DynamicDissolveMaterialInstance;
+	//材质在蓝图上设置，设置了材质实例之后，由动态材质修改值
+	UPROPERTY(EditAnywhere,Category=Elim)
+	UMaterialInstance*DissolveMaterialInstance;
+
+	
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -90,6 +113,11 @@ protected:
 
 	//更新HPUI
 	void UpdateHUDHealth();
+
+
+
+
+
 	
 private:
 
