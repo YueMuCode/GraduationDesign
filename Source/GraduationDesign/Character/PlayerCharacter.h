@@ -71,7 +71,7 @@ public:
 	//玩家死亡网格体溶解
 	//相当于timeline节点
 	UPROPERTY(VisibleAnywhere)
-	UTimelineComponent* DissolveTimeline;
+	UTimelineComponent* DTimeline;//不知道为什么啊，这个bug不能使用DissolveTimeline这个变量名，不然会创建失败
 	
 	FOnTimelineFloat DissolveTrack;
 	UFUNCTION()

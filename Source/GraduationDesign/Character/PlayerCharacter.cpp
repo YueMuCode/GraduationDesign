@@ -11,12 +11,13 @@
 #include "GraduationDesign/GameMode/GameLevel1GameMode.h"
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/TimelineComponent.h"
 #include "Net/UnrealNetwork.h"
 
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	CameraArm=CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
 	CameraArm->SetupAttachment(GetMesh());//弹簧臂附着在Character的网格体上
 	CameraArm->TargetArmLength=600.f;//弹簧臂的长度，在蓝图中可以修改
@@ -54,14 +55,15 @@ APlayerCharacter::APlayerCharacter()
 
 	//转身速度
 	//GetCharacterMovement()->RotationRate=FRotator(0.f,0.f,850.f);
-
 	//创建Timeline组件
-	DissolveTimeline=CreateDefaultSubobject<UTimelineComponent>("Timeline组件");
+	DTimeline=CreateDefaultSubobject<UTimelineComponent>(TEXT("时间轴"));
+	
 }
 
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	UpdateHUDHealth();
 
 	if(HasAuthority())
@@ -177,7 +179,7 @@ void APlayerCharacter::MulticastElim_Implementation()
 		DynamicDissolveMaterialInstance=UMaterialInstanceDynamic::Create(DissolveMaterialInstance,this);
 		GetMesh()->SetMaterial(0,DynamicDissolveMaterialInstance);//修改mesh的材质
 		GetMesh()->SetMaterial(1,DynamicDissolveMaterialInstance);
-		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"),0.55f);
+		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Dissolve"),-0.55f);
 		DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Glow"),200.f);
 	}
 	//开始动态修改材质的参数
@@ -242,10 +244,10 @@ void APlayerCharacter::UpdateDissolveeMaterial(float DissolveValue)
 void APlayerCharacter::StartDissolve()
 {
 	DissolveTrack.BindDynamic(this,&APlayerCharacter::APlayerCharacter::UpdateDissolveeMaterial);
-	if(DissolveCurve&&DissolveTimeline)
+	if(DissolveCurve&&DTimeline)
 	{
-		DissolveTimeline->AddInterpFloat(DissolveCurve,DissolveTrack);
-		DissolveTimeline->Play();
+		DTimeline->AddInterpFloat(DissolveCurve,DissolveTrack);
+		DTimeline->Play();
 	}
 }
 
