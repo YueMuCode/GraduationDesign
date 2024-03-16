@@ -58,10 +58,11 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	MyPlayerController=Cast<AMyPlayerController>(Controller);
-	if(MyPlayerController)
+	UpdateHUDHealth();
+
+	if(HasAuthority())
 	{
-		MyPlayerController->SetHUDHealth(Health,MaxHealth);
+		OnTakeAnyDamage.AddDynamic(this,&APlayerCharacter::ReceiveDamage);
 	}
 }
 
@@ -351,6 +352,8 @@ void APlayerCharacter::SimProxiesTurn()
 }
 
 
+
+
 void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)
 {
 	if(OverlapWeapon)//如果再次运行到这，意味着此时正在走出碰撞区域
@@ -414,10 +417,10 @@ void APlayerCharacter::TurnInPlace(float DeltaTime)
 }
 
 //多播受伤蒙太奇
-void APlayerCharacter::MulticastHit_Implementation()
-{
-	PlayHitReactMontage();
-}
+// void APlayerCharacter::MulticastHit_Implementation()
+// {
+// 	PlayHitReactMontage();
+// }
 
 void APlayerCharacter::HideCameraIfCharacterClose()
 {
@@ -452,8 +455,29 @@ void APlayerCharacter::ServerEquipButtonPressed_Implementation()
 	CombatComponent->EquipWeapon(OverlapWeapon);
 }
 
+//接受子弹伤害
+void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UDamageType* DAmageType,
+	AController* InstigatorController, AActor* DamageCauser)
+{
+	Health=FMath::Clamp(Health-Damage,0.f,MaxHealth);
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+}
+
+
 //Player Stats
 void APlayerCharacter::OnRep_Health()
 {
+	UpdateHUDHealth();
+	PlayHitReactMontage();
+	
 }
+void APlayerCharacter::UpdateHUDHealth()
+{
+	MyPlayerController=MyPlayerController==nullptr? Cast<AMyPlayerController>(Controller):MyPlayerController;
+	if(MyPlayerController)
+	{
+		MyPlayerController->SetHUDHealth(Health,MaxHealth);
+	}
 
+}

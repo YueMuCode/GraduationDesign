@@ -61,11 +61,11 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	FVector NormalImpulse, const FHitResult& Hit)
 {
 	//播放受伤的蒙太奇
-	APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(OtherActor);
-	if(PlayerCharacter)
-	{
-		PlayerCharacter->MulticastHit();
-	}
+	// APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(OtherActor);
+	// if(PlayerCharacter)
+	// {
+	// 	PlayerCharacter->MulticastHit();
+	// }
 
 	//摧毁
 	Destroy();//destroy函数底层内置了网络通信，可以直接使用。最终会在底层调用到destroyed

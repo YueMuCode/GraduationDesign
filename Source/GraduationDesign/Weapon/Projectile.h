@@ -23,6 +23,10 @@ protected:
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent*HitComp,AActor*OtherActor,UPrimitiveComponent*OtherComp,FVector NormalImpulse,const FHitResult& Hit);
 
+	//子弹的伤害
+	UPROPERTY(EditAnywhere)
+	float Damage=20.f;
+
 private:
 	//碰撞盒
 	UPROPERTY(EditAnywhere)
@@ -43,4 +47,6 @@ private:
 	UParticleSystem* ImpactParticles;
 	UPROPERTY(EditAnywhere)
 	class USoundCue* ImpactSound;
+
+	
 };

@@ -46,8 +46,8 @@ public:
 	FORCEINLINE UCameraComponent*GetFollowCamera()const {return FollowCamera;}
 
 	//服务器上多播受伤蒙太奇
-	UFUNCTION(NetMulticast,Unreliable)
-	void MulticastHit();
+	// UFUNCTION(NetMulticast,Unreliable)
+	// void MulticastHit();
 
 	//代理选择平滑
 	FORCEINLINE bool ShouldRotateRootBone() const {return bRotateRootBone;}
@@ -72,6 +72,13 @@ protected:
 	//代理旋转平滑
 	void SimProxiesTurn();
 
+	//子弹伤害
+	UFUNCTION()
+	void ReceiveDamage(AActor*DamageActor,float Damage,const UDamageType*DAmageType,class AController* InstigatorController,AActor*DamageCauser);
+
+	//更新HPUI
+	void UpdateHUDHealth();
+	
 private:
 
 	//添加必要的两个组件，相机和弹簧臂
