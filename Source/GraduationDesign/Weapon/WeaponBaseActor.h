@@ -81,6 +81,8 @@ public:
 	float FireDelay=.15f;
 	UPROPERTY(EditAnywhere,Category=Combat)
 	bool bAutomatic=true;
+	//玩家死亡之后掉落武器
+	void Dropped();
 protected:
 
 private:

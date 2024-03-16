@@ -76,6 +76,13 @@ void UCombatComponent::OnRep_EquippedWeapon()
 {
 	if(EquippedWeapon&&Character)//客户端实现
 	{
+		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);//设置武器的状态
+		//将武器附着在人物的骨骼上
+		const USkeletalMeshSocket*HandSocket= Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
+		if(HandSocket)
+		{
+			HandSocket->AttachActor(EquippedWeapon,Character->GetMesh());
+		}
 		Character->GetCharacterMovement()->bOrientRotationToMovement=false;
 		Character->bUseControllerRotationYaw=true;
 	}
@@ -303,7 +310,6 @@ void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 	if(Character==nullptr||WeaponToEquip==nullptr)return;
 	EquippedWeapon=WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);//设置武器的状态
-
 	//将武器附着在人物的骨骼上
 	const USkeletalMeshSocket*HandSocket= Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 	if(HandSocket)

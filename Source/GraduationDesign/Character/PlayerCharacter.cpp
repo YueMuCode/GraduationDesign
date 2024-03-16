@@ -184,6 +184,16 @@ void APlayerCharacter::MulticastElim_Implementation()
 	}
 	//开始动态修改材质的参数
 	StartDissolve();
+
+	//修改玩家死亡之后的碰撞等属性
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->StopMovementImmediately();
+	if(MyPlayerController)
+	{
+		DisableInput(MyPlayerController);
+	}
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 FVector APlayerCharacter::GetHitTarget() const
@@ -212,6 +222,10 @@ void APlayerCharacter::OnRep_ReplicatedMovement()
 
 void APlayerCharacter::Elim()
 {
+	if(CombatComponent&&CombatComponent->EquippedWeapon)
+	{
+		CombatComponent->EquippedWeapon->Dropped();
+	}
 	MulticastElim();
 	GetWorldTimerManager().SetTimer(
 		ElimTimer,

@@ -104,9 +104,23 @@ void AWeaponBaseActor::SetWeaponState(EWeaponState State)
 	case EWeaponState::EWS_Equipped:
 		ShowPickUpWidget(false);
 		AreaSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);//在服务器上执行
+		//捡起掉落的武器需要重置状态
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EWeaponState::EWS_Dropped:
+		if(HasAuthority())//在服务器
+		{
+			AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		}
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	}
 }
+
 
 
 void AWeaponBaseActor::OnRep_WeaponState()
@@ -115,6 +129,15 @@ void AWeaponBaseActor::OnRep_WeaponState()
 	{
 	case EWeaponState::EWS_Equipped:
 		ShowPickUpWidget(false);
+		//捡起掉落的武器需要重置状态
+		WeaponMesh->SetSimulatePhysics(false);
+		WeaponMesh->SetEnableGravity(false);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		break;
+	case EWeaponState::EWS_Dropped:
+		WeaponMesh->SetSimulatePhysics(true);
+		WeaponMesh->SetEnableGravity(true);
+		WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		break;
 	}
 }
@@ -140,3 +163,14 @@ void AWeaponBaseActor::Fire(const FVector& HitTarget)
 		}
 	}
 }
+//武器掉落
+void AWeaponBaseActor::Dropped()
+{
+	SetWeaponState(EWeaponState::EWS_Dropped);
+	//武器分离
+	FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld,true);
+	WeaponMesh->DetachFromComponent(DetachRules);
+	SetOwner(nullptr);
+	
+}
+
