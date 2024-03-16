@@ -3,8 +3,13 @@
 
 #include "GameLevel1GameMode.h"
 
+#include "GraduationDesign/Character/PlayerCharacter.h"
+
 void AGameLevel1GameMode::PlayerEliminated(APlayerCharacter* ElimmedCharacter, AMyPlayerController* victimController,
-	AMyPlayerController* AttackerController)
+                                           AMyPlayerController* AttackerController)
 {
-	
+	if(ElimmedCharacter)
+	{
+		ElimmedCharacter->Elim();
+	}
 }

@@ -39,6 +39,7 @@ public:
 	//播放蒙太奇
 	void PlayFireMontage(bool bAiming);
 	void PlayHitReactMontage();
+	void PlayElimMontage();
 	//调整枪口
 	FVector GetHitTarget()const;
 
@@ -53,9 +54,11 @@ public:
 	FORCEINLINE bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	void CalculateAO_Pitch();
 	virtual void OnRep_ReplicatedMovement() override;
-
+	//被淘汰
+	UFUNCTION(NetMulticast,Reliable)
 	void Elim();
-	
+	bool bElimmed=false;
+	FORCEINLINE bool IsElimmed()const {return bElimmed;}
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -125,7 +128,10 @@ private:
 	//受伤动画
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UAnimMontage* HitReactMontage;
-	
+
+	//淘汰蒙太奇动画
+	UPROPERTY(EditAnywhere,Category=Combat)
+	UAnimMontage* ElimMontage;
 	
 	//防止相机怼到墙上丢失视野
 	void HideCameraIfCharacterClose();
@@ -152,4 +158,6 @@ private:
 	void OnRep_Health();
 
 	AMyPlayerController*MyPlayerController;
+
+	
 };

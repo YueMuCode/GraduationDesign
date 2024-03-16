@@ -41,6 +41,9 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	//旋转平滑参数
 	bRotateRootBone=PlayerCharacter->ShouldRotateRootBone();
 
+	//淘汰
+	bElimmed=PlayerCharacter->IsElimmed();
+
 	//无法理解下面这段代码的数学含义
 	FRotator AimRotation=PlayerCharacter->GetBaseAimRotation();//?全局旋转
 	FRotator MovementRotation=UKismetMathLibrary::MakeRotFromX(PlayerCharacter->GetVelocity());//?局部（根据玩家前进方向旋转）

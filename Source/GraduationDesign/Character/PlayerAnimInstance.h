@@ -74,4 +74,7 @@ private:
 	//代码旋转平滑
 	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
 	bool bRotateRootBone;
+
+	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
+	bool bElimmed;
 };

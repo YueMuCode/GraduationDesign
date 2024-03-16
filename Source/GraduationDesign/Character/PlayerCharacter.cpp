@@ -156,6 +156,19 @@ void APlayerCharacter::PlayHitReactMontage()
 	}
 }
 
+void APlayerCharacter::PlayElimMontage()
+{
+	UAnimInstance* AnimInstance=GetMesh()->GetAnimInstance();
+	if(AnimInstance&&ElimMontage)
+	{
+		AnimInstance->Montage_Play(ElimMontage);
+	}
+}
+void APlayerCharacter::Elim_Implementation()
+{
+	bElimmed=true;
+	PlayElimMontage();
+}
 
 FVector APlayerCharacter::GetHitTarget() const
 {
@@ -181,10 +194,8 @@ void APlayerCharacter::OnRep_ReplicatedMovement()
 	TimeSinceLastMovementReplication=0.f;
 }
 
-void APlayerCharacter::Elim()
-{
-	
-}
+
+
 
 void APlayerCharacter::MoveForward(float value)
 {
@@ -470,7 +481,7 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 	PlayHitReactMontage();
 
 	//调用GameMode从而实现玩家淘汰等功能
-	if(Health<=0.f)
+	if(Health==0.f)
 	{
 		AGameLevel1GameMode* GameLevel1GameMode= GetWorld()->GetAuthGameMode<AGameLevel1GameMode>();
 		if(GameLevel1GameMode)
