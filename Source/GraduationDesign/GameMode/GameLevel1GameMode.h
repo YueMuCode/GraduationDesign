@@ -14,5 +14,8 @@ class GRADUATIONDESIGN_API AGameLevel1GameMode : public AGameMode
 {
 	GENERATED_BODY()
 public:
+	//通知淘汰
 	virtual void PlayerEliminated(class APlayerCharacter*ElimmedCharacter,class AMyPlayerController* victimController,AMyPlayerController* AttackerController);
+	//通知重生
+	virtual void RequestRespawn(ACharacter* ElimmedCharacter,AController*ElimmedController);
 };

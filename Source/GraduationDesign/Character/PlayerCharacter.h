@@ -56,9 +56,16 @@ public:
 	virtual void OnRep_ReplicatedMovement() override;
 	//被淘汰
 	UFUNCTION(NetMulticast,Reliable)
-	void Elim();
+	void MulticastElim();
+	void Elim();//只发生在服务器上
 	bool bElimmed=false;
 	FORCEINLINE bool IsElimmed()const {return bElimmed;}
+
+	//重生计时器
+	FTimerHandle ElimTimer;
+	UPROPERTY(EditDefaultsOnly)
+	float ElimDelay=3.f;
+	void ElimTimerFinished();
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);

@@ -164,7 +164,7 @@ void APlayerCharacter::PlayElimMontage()
 		AnimInstance->Montage_Play(ElimMontage);
 	}
 }
-void APlayerCharacter::Elim_Implementation()
+void APlayerCharacter::MulticastElim_Implementation()
 {
 	bElimmed=true;
 	PlayElimMontage();
@@ -194,8 +194,26 @@ void APlayerCharacter::OnRep_ReplicatedMovement()
 	TimeSinceLastMovementReplication=0.f;
 }
 
+void APlayerCharacter::Elim()
+{
+	MulticastElim();
+	GetWorldTimerManager().SetTimer(
+		ElimTimer,
+		this,
+		&APlayerCharacter::ElimTimerFinished,
+		ElimDelay
+	);
+}
 
 
+void APlayerCharacter::ElimTimerFinished()
+{
+	AGameLevel1GameMode* GameLevel1GameMode=GetWorld()->GetAuthGameMode<AGameLevel1GameMode>();
+	if(GameLevel1GameMode)
+	{
+		GameLevel1GameMode->RequestRespawn(this,Controller);
+	}
+}
 
 void APlayerCharacter::MoveForward(float value)
 {
