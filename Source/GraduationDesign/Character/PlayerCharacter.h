@@ -141,4 +141,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_Health();
+
+	AMyPlayerController*MyPlayerController;
 };

@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "GraduationDesign/HUD/PlayerHUD.h"
 #include "MyPlayerController.generated.h"
+
 
 /**
  * 
@@ -15,10 +17,10 @@ class GRADUATIONDESIGN_API AMyPlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-
+	//血条数据
+	void SetHUDHealth(float Health,float MaxHealth);
 protected:
-
-private:
+	virtual  void BeginPlay() override;
 	//玩家血量
 	APlayerHUD* PlayerHUD;
 	

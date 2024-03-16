@@ -58,7 +58,11 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	MyPlayerController=Cast<AMyPlayerController>(Controller);
+	if(MyPlayerController)
+	{
+		MyPlayerController->SetHUDHealth(Health,MaxHealth);
+	}
 }
 
 void APlayerCharacter::Tick(float DeltaTime)
