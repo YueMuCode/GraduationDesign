@@ -88,7 +88,12 @@ private:
 	float CurrentFOV;
 	void InterpFOV(float DeltaTime);
 
-
+	//自动开火
+	FTimerHandle FireTimer;
+	bool bCanFire=true;
+	void StartFireTimer();
+	void FireTimerFinished();
+	void Fire();
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	

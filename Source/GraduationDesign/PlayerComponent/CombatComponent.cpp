@@ -84,17 +84,10 @@ void UCombatComponent::OnRep_EquippedWeapon()
 void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed=bPressed;
-	if(bFireButtonPressed)
+	if(bFireButtonPressed&&EquippedWeapon)
 	{
-		//发出射线
-		FHitResult HitResult;
-		TraceUnderCrosshairs(HitResult);
-		ServerFire(HitResult.ImpactPoint);
-
-		if(EquippedWeapon)
-		{
-			CrosshairShootingFactor=1.f;
-		}
+		Fire();
+		
 	}
 	
 }
@@ -265,6 +258,44 @@ void UCombatComponent::InterpFOV(float DeltaTime)
 	{
 		Character->GetFollowCamera()->SetFieldOfView(CurrentFOV);
 	}
+}
+
+//全自动开火
+void UCombatComponent::StartFireTimer()
+{
+	if(EquippedWeapon==nullptr||Character==nullptr)return;
+	Character->GetWorldTimerManager().SetTimer(
+		FireTimer,
+		this,
+		&UCombatComponent::FireTimerFinished,
+		 EquippedWeapon->FireDelay
+	);
+	
+}
+//全自动开火
+void UCombatComponent::FireTimerFinished()
+{
+	if(EquippedWeapon==nullptr)return;
+	bCanFire=true;
+	if(bFireButtonPressed&&EquippedWeapon->bAutomatic)
+	{
+		Fire();
+	}
+}
+
+void UCombatComponent::Fire()
+{
+	if(bCanFire)
+	{
+		bCanFire=false;
+		ServerFire(HitTarget);
+		if(EquippedWeapon)
+		{
+			CrosshairShootingFactor=1.f;
+		}
+		StartFireTimer();
+	}
+	
 }
 
 void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)

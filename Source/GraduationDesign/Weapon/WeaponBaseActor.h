@@ -76,6 +76,11 @@ public:
 	float ZoomInterSpeed=20.f;
 	FORCEINLINE float GetZoomedFOV() const {return ZoomedFOV;}
 	FORCEINLINE float GetZoomInterSpeed() const {return ZoomInterSpeed;}
+	//自动开火
+	UPROPERTY(EditAnywhere,Category=Combat)
+	float FireDelay=.15f;
+	UPROPERTY(EditAnywhere,Category=Combat)
+	bool bAutomatic=true;
 protected:
 
 private:
