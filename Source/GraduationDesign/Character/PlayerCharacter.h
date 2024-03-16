@@ -53,6 +53,8 @@ public:
 	FORCEINLINE bool ShouldRotateRootBone() const {return bRotateRootBone;}
 	void CalculateAO_Pitch();
 	virtual void OnRep_ReplicatedMovement() override;
+
+	void Elim();
 	
 protected:
 	void MoveForward(float value);

@@ -13,5 +13,6 @@ UCLASS()
 class GRADUATIONDESIGN_API AGameLevel1GameMode : public AGameMode
 {
 	GENERATED_BODY()
-	
+public:
+	virtual void PlayerEliminated(class APlayerCharacter*ElimmedCharacter,class AMyPlayerController* victimController,AMyPlayerController* AttackerController);
 };

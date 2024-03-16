@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GraduationDesign/GameMode/GameLevel1GameMode.h"
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
@@ -178,6 +179,11 @@ void APlayerCharacter::OnRep_ReplicatedMovement()
 	Super::OnRep_ReplicatedMovement();
 	SimProxiesTurn();
 	TimeSinceLastMovementReplication=0.f;
+}
+
+void APlayerCharacter::Elim()
+{
+	
 }
 
 void APlayerCharacter::MoveForward(float value)
@@ -462,6 +468,19 @@ void APlayerCharacter::ReceiveDamage(AActor* DamageActor, float Damage, const UD
 	Health=FMath::Clamp(Health-Damage,0.f,MaxHealth);
 	UpdateHUDHealth();
 	PlayHitReactMontage();
+
+	//调用GameMode从而实现玩家淘汰等功能
+	if(Health<=0.f)
+	{
+		AGameLevel1GameMode* GameLevel1GameMode= GetWorld()->GetAuthGameMode<AGameLevel1GameMode>();
+		if(GameLevel1GameMode)
+		{
+			MyPlayerController=MyPlayerController==nullptr?Cast<AMyPlayerController>(Controller):MyPlayerController;
+			AMyPlayerController* AttackerController=Cast<AMyPlayerController>(InstigatorController);
+			GameLevel1GameMode->PlayerEliminated(this,MyPlayerController,AttackerController);
+		}
+	}
+	
 }
 
 
