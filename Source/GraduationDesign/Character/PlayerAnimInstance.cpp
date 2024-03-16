@@ -38,6 +38,8 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	bIsAiming=PlayerCharacter->IsAiming();
 
+	//旋转平滑参数
+	bRotateRootBone=PlayerCharacter->ShouldRotateRootBone();
 
 	//无法理解下面这段代码的数学含义
 	FRotator AimRotation=PlayerCharacter->GetBaseAimRotation();//?全局旋转

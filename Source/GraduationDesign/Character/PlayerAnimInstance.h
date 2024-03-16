@@ -70,4 +70,8 @@ private:
 	//调整枪口位置
 	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
 	FRotator RightHandRotation;
+
+	//代码旋转平滑
+	UPROPERTY(BlueprintReadOnly,Category=Character,meta=(AllowPrivateAccess=true))
+	bool bRotateRootBone;
 };

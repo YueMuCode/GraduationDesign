@@ -48,6 +48,12 @@ public:
 	//服务器上多播受伤蒙太奇
 	UFUNCTION(NetMulticast,Unreliable)
 	void MulticastHit();
+
+	//代理选择平滑
+	FORCEINLINE bool ShouldRotateRootBone() const {return bRotateRootBone;}
+	void CalculateAO_Pitch();
+	virtual void OnRep_ReplicatedMovement() override;
+	
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -62,6 +68,9 @@ protected:
 	void FireButtonReleased();
 	
 	void AimOffset(float DeltaTime);
+
+	//代理旋转平滑
+	void SimProxiesTurn();
 
 private:
 
@@ -113,4 +122,13 @@ private:
 	void HideCameraIfCharacterClose();
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold=200.f;
+
+	//代理旋转平滑
+	bool bRotateRootBone;
+	float TurnThreshold=0.5f;
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotation;
+	float ProxyYaw;
+	float TimeSinceLastMovementReplication;
+	float CalculateSpeed();
 };

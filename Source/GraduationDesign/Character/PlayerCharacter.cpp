@@ -64,7 +64,19 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	AimOffset(DeltaTime);
+	if(GetLocalRole()>ROLE_SimulatedProxy&&IsLocallyViewed())
+	{
+		AimOffset(DeltaTime);
+	}
+	else
+	{
+		TimeSinceLastMovementReplication+=DeltaTime;
+		if(TimeSinceLastMovementReplication>0.25f)
+		{
+			OnRep_ReplicatedMovement(); 
+		}
+		CalculateAO_Pitch();
+	}
 	HideCameraIfCharacterClose();
 }
 
@@ -142,6 +154,24 @@ FVector APlayerCharacter::GetHitTarget() const
 {
 	if(CombatComponent==nullptr)return FVector();
 	return CombatComponent->HitTarget;
+}
+
+void APlayerCharacter::CalculateAO_Pitch()
+{
+	AO_Pitch=GetBaseAimRotation().Pitch;
+	if(AO_Pitch>90.f&&!IsLocallyControlled())
+	{
+		FVector2D InRange(270.f,360.f);
+		FVector2D OutRange(-90,0.f);
+		AO_Pitch=FMath::GetMappedRangeValueClamped(InRange,OutRange,AO_Pitch);
+	}
+}
+
+void APlayerCharacter::OnRep_ReplicatedMovement()
+{
+	Super::OnRep_ReplicatedMovement();
+	SimProxiesTurn();
+	TimeSinceLastMovementReplication=0.f;
 }
 
 void APlayerCharacter::MoveForward(float value)
@@ -251,6 +281,7 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 
 	if(Speed==0.f&&!bIsAir)
 	{
+		bRotateRootBone=true;//代理旋转平滑参数
 		FRotator CurrentAimRotation=FRotator(0.f,GetBaseAimRotation().Yaw,0.f);
 		FRotator DeltaAimRotation=UKismetMathLibrary::NormalizedDeltaRotator(CurrentAimRotation,StartingAimRotation);
 		AO_Yaw=DeltaAimRotation.Yaw;
@@ -263,6 +294,7 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 	}
 	if(Speed>0.f||bIsAir)
 	{
+		bRotateRootBone=false;//代理旋转平滑参数
 		StartingAimRotation=FRotator(0.f,GetBaseAimRotation().Yaw,0.f);
 		AO_Yaw=0.f;
 		bUseControllerRotationYaw=true;
@@ -279,6 +311,41 @@ void APlayerCharacter::AimOffset(float DeltaTime)
 	}
 }
 
+//处理模拟端的旋转不平滑问题
+void APlayerCharacter::SimProxiesTurn()
+{
+	if(CombatComponent==nullptr||CombatComponent==nullptr)return;
+	float Speed=CalculateSpeed();
+	bRotateRootBone=false;
+	if(Speed>0.f)
+	{
+		TurningInPlace=ETurningInPlace::ETIP_NotTurning;
+		return;
+	}
+
+	ProxyRotationLastFrame=ProxyRotation;
+	ProxyRotation=GetActorRotation();
+	ProxyYaw=UKismetMathLibrary::NormalizedDeltaRotator(ProxyRotation,ProxyRotationLastFrame).Yaw;
+
+	//重新处理转身
+	if(FMath::Abs(ProxyYaw)>TurnThreshold)
+	{
+		if(ProxyYaw>TurnThreshold)
+		{
+			TurningInPlace=ETurningInPlace::ETIP_Right;
+		}
+		else if(ProxyYaw<-TurnThreshold)
+		{
+			TurningInPlace=ETurningInPlace::ETIP_Left;
+		}
+		else
+		{
+			TurningInPlace=ETurningInPlace::ETIP_NotTurning;
+		}
+		return;
+	}
+	TurningInPlace=ETurningInPlace::ETIP_NotTurning;
+}
 
 
 void APlayerCharacter::SetOverlapWeapon(AWeaponBaseActor* Weapon)
@@ -367,6 +434,13 @@ void APlayerCharacter::HideCameraIfCharacterClose()
 			CombatComponent->EquippedWeapon->GetWeaponMesh()->bOwnerNoSee=false;
 		}
 	}
+}
+
+float APlayerCharacter::CalculateSpeed()
+{
+	FVector Velocity=GetVelocity();
+	Velocity.Z=0.f;
+	return Velocity.Size();
 }
 
 void APlayerCharacter::ServerEquipButtonPressed_Implementation()
