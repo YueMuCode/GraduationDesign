@@ -104,6 +104,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(APlayerCharacter,OverlapWeapon,COND_OwnerOnly);//对OverlapWeapon进行复制，类型为拥有该对象的客户端（通常是服务器）才会复制这个属性
+	DOREPLIFETIME(APlayerCharacter,Health);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -253,7 +254,6 @@ void APlayerCharacter::Jump()
 		Super::Jump();
 	}
 }
-
 void APlayerCharacter::FireButtonPressed()
 {
 	if(CombatComponent)
@@ -261,7 +261,6 @@ void APlayerCharacter::FireButtonPressed()
 		CombatComponent->FireButtonPressed(true);
 	}
 }
-
 void APlayerCharacter::FireButtonReleased()
 {
 	if(CombatComponent)
@@ -443,8 +442,14 @@ float APlayerCharacter::CalculateSpeed()
 	return Velocity.Size();
 }
 
+
 void APlayerCharacter::ServerEquipButtonPressed_Implementation()
 {
 	CombatComponent->EquipWeapon(OverlapWeapon);
+}
+
+//Player Stats
+void APlayerCharacter::OnRep_Health()
+{
 }
 

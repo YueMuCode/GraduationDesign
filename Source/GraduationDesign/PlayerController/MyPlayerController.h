@@ -13,5 +13,13 @@ UCLASS()
 class GRADUATIONDESIGN_API AMyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+public:
+
+protected:
+
+private:
+	//玩家血量
+	APlayerHUD* PlayerHUD;
 	
 };

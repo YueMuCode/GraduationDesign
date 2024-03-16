@@ -36,6 +36,15 @@ public:
 	virtual void DrawHUD() override;
 
 	FORCEINLINE void SetHUDPackage(const FHUDPackage&Package){HUDPackage=Package;}
+
+	//玩家血量
+	class UCharacterOverlayWidget* CharacterOverlay;
+	UPROPERTY(EditAnywhere,Category="Player Stats")
+	TSubclassOf< UUserWidget> CharacterOverlayClass;
+
+protected:
+	virtual void BeginPlay() override;
+	void AddCharacterOverlay();
 private:
 	//绘制武器准心
 	FHUDPackage HUDPackage;

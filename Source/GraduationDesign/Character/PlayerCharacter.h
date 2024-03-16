@@ -131,4 +131,14 @@ private:
 	float ProxyYaw;
 	float TimeSinceLastMovementReplication;
 	float CalculateSpeed();
+
+	//玩家血量
+	UPROPERTY(EditAnywhere,Category="PlayStats")
+	float MaxHealth=100.f;
+
+	UPROPERTY(ReplicatedUsing=OnRep_Health,VisibleAnywhere,Category="PlayStats")
+	float Health=100.f;
+
+	UFUNCTION()
+	void OnRep_Health();
 };
