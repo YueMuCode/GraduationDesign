@@ -48,6 +48,11 @@ protected:
 
 	//绘制武器准心
 	void SetHUDCrossairs(float delta);
+
+	//Reload功能
+	void Reload();
+	UFUNCTION(Server,Reliable)
+	void ServerReload();
 private:
 	APlayerCharacter* Character;
 

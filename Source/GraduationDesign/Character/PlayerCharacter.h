@@ -42,6 +42,7 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void PlayHitReactMontage();
 	void PlayElimMontage();
+	void PlayReloadMontage();
 	//调整枪口
 	FVector GetHitTarget()const;
 
@@ -122,6 +123,7 @@ protected:
 	virtual void Jump() override;
 	void FireButtonPressed();
 	void FireButtonReleased();
+	void ReloadButtonPressed();
 	
 	void AimOffset(float DeltaTime);
 
@@ -188,6 +190,11 @@ private:
 	//淘汰蒙太奇动画
 	UPROPERTY(EditAnywhere,Category=Combat)
 	UAnimMontage* ElimMontage;
+
+	//装弹蒙太奇动画
+	UPROPERTY(EditAnywhere,Category=Combat)
+	UAnimMontage* ReloadMontage;
+
 	
 	//防止相机怼到墙上丢失视野
 	void HideCameraIfCharacterClose();

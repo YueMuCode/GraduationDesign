@@ -115,6 +115,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 	PlayerInputComponent->BindAction("Fire",IE_Pressed,this,&ThisClass::FireButtonPressed);
 	PlayerInputComponent->BindAction("Fire",IE_Released,this,&ThisClass::FireButtonReleased);
+	PlayerInputComponent->BindAction("Reload",IE_Pressed,this,&ThisClass::ReloadButtonPressed);
 }
 
 void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -153,7 +154,24 @@ void APlayerCharacter::PlayFireMontage(bool bAiming)
 		AnimInstance->Montage_JumpToSection(SectionName);
 	}
 }
+void APlayerCharacter::PlayReloadMontage()
+{
+	if(CombatComponent==nullptr||CombatComponent->EquippedWeapon==nullptr)return;
 
+	UAnimInstance* AnimInstance=GetMesh()->GetAnimInstance();
+	if(AnimInstance&&ReloadMontage)
+	{
+		AnimInstance->Montage_Play(ReloadMontage);
+		FName SectionName;
+		switch (CombatComponent->EquippedWeapon->GetWeaponType())
+		{
+		case EWeaponType::EWT_AssaulRifle:
+			SectionName=FName("Rifle");
+			break;
+		}
+		AnimInstance->Montage_JumpToSection(SectionName);
+	}
+}
 void APlayerCharacter::PlayHitReactMontage()
 {
 	if(CombatComponent==nullptr||CombatComponent->EquippedWeapon==nullptr)return;
@@ -175,6 +193,9 @@ void APlayerCharacter::PlayElimMontage()
 		AnimInstance->Montage_Play(ElimMontage);
 	}
 }
+
+
+
 void APlayerCharacter::MulticastElim_Implementation()
 {
 	//玩家死亡处理子弹显示
@@ -413,6 +434,14 @@ void APlayerCharacter::FireButtonReleased()
 	if(CombatComponent)
 	{
 		CombatComponent->FireButtonPressed(false);
+	}
+}
+
+void APlayerCharacter::ReloadButtonPressed()
+{
+	if(CombatComponent)
+	{
+		CombatComponent->Reload();
 	}
 }
 
