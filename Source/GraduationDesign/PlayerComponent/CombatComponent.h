@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "GraduationDesign/HUD/PlayerHUD.h"
 #include "GraduationDesign/PlayerController/MyPlayerController.h"
+#include "GraduationDesign/Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
 
@@ -97,6 +98,19 @@ private:
 
 	//处理子弹小于零仍旧能开火的情况
 	bool CanFire();
+	//子弹容量
+	UPROPERTY(ReplicatedUsing=OnRep_CarriedAmmo)
+	int32 CarriedAmmo;
+
+	UFUNCTION()
+	void OnRep_CarriedAmmo();
+
+	TMap<EWeaponType,int32> CarriedAmmoMap;
+
+	//初始弹药容量
+	UPROPERTY(EditAnywhere)
+	int32 StartingARAmmo=30;
+	void InitializeCarriedAmmo();
 	
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);

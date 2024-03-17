@@ -67,6 +67,17 @@ void AMyPlayerController::SetHUDWeaponAmmo(int32 Ammo)
 	}
 }
 
+void AMyPlayerController::SetHUDCarriedAmmo(int32 Ammo)
+{
+	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	bool bHUDValid=PlayerHUD&&PlayerHUD->CharacterOverlay&&	PlayerHUD->CharacterOverlay->CarriedAmmoAmount;
+	if(bHUDValid)
+	{
+		FString CarriedAmmoText=FString::Printf(TEXT("%d"),Ammo);
+		PlayerHUD->CharacterOverlay->CarriedAmmoAmount->SetText(FText::FromString(CarriedAmmoText));
+	}
+}
+
 //修复服务端在死亡之后血条不刷新
 void AMyPlayerController::OnPossess(APawn* InPawn)
 {

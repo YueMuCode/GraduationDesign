@@ -31,7 +31,14 @@ void UCombatComponent::BeginPlay()
 			DefaultFOV=Character->GetFollowCamera()->FieldOfView;//设置视角
 			CurrentFOV=DefaultFOV;
 		}
+		//枪支弹药
+		if(Character->HasAuthority())
+		{
+			InitializeCarriedAmmo();
+		}
 	}
+	
+	
 }
 
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -50,6 +57,14 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		InterpFOV(DeltaTime);
 	}
 
+}
+
+void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(UCombatComponent,EquippedWeapon);//EquippedWeapon进行复制
+	DOREPLIFETIME(UCombatComponent,bAiming);
+	DOREPLIFETIME_CONDITION(UCombatComponent,CarriedAmmo,COND_OwnerOnly);
 }
 
 void UCombatComponent::SetAiming(bool bIsAiming)
@@ -241,12 +256,7 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 
 
 
-void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(UCombatComponent,EquippedWeapon);//EquippedWeapon进行复制
-	DOREPLIFETIME(UCombatComponent,bAiming);
-}
+
 //瞄准视野变大
 void UCombatComponent::InterpFOV(float DeltaTime)
 {
@@ -305,6 +315,8 @@ void UCombatComponent::Fire()
 	
 }
 
+
+
 void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 {
 	if(Character==nullptr||WeaponToEquip==nullptr)return;
@@ -325,6 +337,15 @@ void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 	}
 	EquippedWeapon->SetOwner(Character);
 	EquippedWeapon->SetHUDAmmo();
+	if(CarriedAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarriedAmmo=CarriedAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+	Controller=Controller==nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
+	if(Controller)
+	{
+		Controller->SetHUDCarriedAmmo(CarriedAmmo);
+	}
 	//当持枪的时候，需要将视角锁定,并且跟随控制器旋转
 	Character->GetCharacterMovement()->bOrientRotationToMovement=false;
 	Character->bUseControllerRotationYaw=true;
@@ -335,4 +356,17 @@ bool UCombatComponent::CanFire()
 {
 	if(EquippedWeapon==nullptr)return false;
 	return !EquippedWeapon->IsEmpty()||!bCanFire;
+}
+
+void UCombatComponent::OnRep_CarriedAmmo()
+{
+	Controller=Controller==nullptr?Cast<AMyPlayerController>(Character->Controller):Controller;
+	if(Controller)
+	{
+		Controller->SetHUDCarriedAmmo(CarriedAmmo);
+	}
+}
+void UCombatComponent::InitializeCarriedAmmo()
+{
+	CarriedAmmoMap.Emplace(EWeaponType::EWT_AssaulRifle,StartingARAmmo);
 }

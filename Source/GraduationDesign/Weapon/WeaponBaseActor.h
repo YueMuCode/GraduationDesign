@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WeaponTypes.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "WeaponBaseActor.generated.h"
@@ -90,6 +91,9 @@ public:
 
 	//处理子弹小于零的情况
 	bool IsEmpty();
+
+	//子弹容量
+	FORCEINLINE EWeaponType GetWeaponType()const {return WeaponType;}
 protected:
 
 private:
@@ -134,4 +138,7 @@ private:
 	class APlayerCharacter* PlayerOwnerCharacter;
 	UPROPERTY()
 	class AMyPlayerController* MyPlayerOwnerController;
+//设置子弹容量
+	UPROPERTY(EditAnywhere)
+	EWeaponType	WeaponType;
 };
