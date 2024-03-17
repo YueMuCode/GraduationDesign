@@ -12,8 +12,10 @@
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/TimelineComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
-
+#include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundCue.h"
 APlayerCharacter::APlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -194,6 +196,36 @@ void APlayerCharacter::MulticastElim_Implementation()
 	}
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	//多播这个生成死亡机器人的效果
+	if(ElimBotEffect)
+	{
+		FVector ElimBotSpawnPoint(GetActorLocation().X,GetActorLocation().Y,GetActorLocation().Z+200.f);//在人物的头顶出现
+		ElimBotComponent=UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(),
+			ElimBotEffect,
+			ElimBotSpawnPoint,
+			GetActorRotation()
+		);
+	}
+	if(ElimBotSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			ElimBotSound,
+			GetActorLocation()
+			);
+	}
+}
+//播放结束之后摧毁机器人
+void APlayerCharacter::Destroyed()
+{
+	Super::Destroyed();
+	//当死亡机器人特效播放结束，消除他
+	if(ElimBotComponent)
+	{
+		ElimBotComponent->DestroyComponent();
+	}
 }
 
 FVector APlayerCharacter::GetHitTarget() const
@@ -243,6 +275,7 @@ void APlayerCharacter::ElimTimerFinished()
 	{
 		GameLevel1GameMode->RequestRespawn(this,Controller);
 	}
+
 }
 
 void APlayerCharacter::UpdateDissolveeMaterial(float DissolveValue)
@@ -264,6 +297,8 @@ void APlayerCharacter::StartDissolve()
 		DTimeline->Play();
 	}
 }
+
+
 
 void APlayerCharacter::MoveForward(float value)
 {

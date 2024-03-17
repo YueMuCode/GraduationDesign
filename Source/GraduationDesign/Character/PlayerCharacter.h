@@ -10,6 +10,7 @@
 #include "GraduationDesign/Interface/InterractWithCrosshairsInterface.h"
 #include "GraduationDesign/PlayerComponent/CombatComponent.h"
 #include "GraduationDesign/TypeFiles/TurningInPlace.h"
+#include "Sound/SoundCue.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -87,6 +88,22 @@ public:
 	//材质在蓝图上设置，设置了材质实例之后，由动态材质修改值
 	UPROPERTY(EditAnywhere,Category=Elim)
 	UMaterialInstance*DissolveMaterialInstance;
+
+	//淘汰时出现的机器人
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ElimBotEffect;
+
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* ElimBotComponent;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* ElimBotSound;
+	//处理机器人播放结束后消失
+	virtual void Destroyed() override;
+	
+
+
+
 
 	
 protected:
