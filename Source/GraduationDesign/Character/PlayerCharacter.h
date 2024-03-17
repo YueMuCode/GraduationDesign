@@ -101,10 +101,13 @@ public:
 	//处理机器人播放结束后消失
 	virtual void Destroyed() override;
 	
+	//用于刷新玩家 血量
+	FORCEINLINE  float GetHealth()const {return Health;}
+	FORCEINLINE  float GetMAXHealth()const {return MaxHealth;}
 
-
-
-
+	//初始化分数的UI（从0开始）
+	void PollInit();
+	class APlayerPlayerState* PlayerPlayerState;
 	
 protected:
 	void MoveForward(float value);

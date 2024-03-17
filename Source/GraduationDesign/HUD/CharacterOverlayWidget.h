@@ -19,4 +19,9 @@ public:
 	class UProgressBar*HealthBar;
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock*HealthText;
+	//分数UI
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock*ScoreText;
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock*ScoreAmount;
 };

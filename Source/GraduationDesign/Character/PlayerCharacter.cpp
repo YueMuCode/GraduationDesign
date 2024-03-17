@@ -12,6 +12,7 @@
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Components/TimelineComponent.h"
+#include "GraduationDesign/PlayerState/PlayerPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
@@ -91,6 +92,9 @@ void APlayerCharacter::Tick(float DeltaTime)
 		CalculateAO_Pitch();
 	}
 	HideCameraIfCharacterClose();
+
+	//初始化分数
+	PollInit();
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -298,7 +302,18 @@ void APlayerCharacter::StartDissolve()
 	}
 }
 
-
+//初始化分数
+void APlayerCharacter::PollInit()
+{
+	if(PlayerPlayerState==nullptr)
+	{
+		PlayerPlayerState=GetPlayerState<APlayerPlayerState>();
+		if(PlayerPlayerState)
+		{
+			PlayerPlayerState->AddToScore(0.f);
+		}
+	}
+}
 
 void APlayerCharacter::MoveForward(float value)
 {

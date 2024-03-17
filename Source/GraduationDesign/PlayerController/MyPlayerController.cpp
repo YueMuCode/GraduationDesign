@@ -5,6 +5,7 @@
 
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "GraduationDesign/Character/PlayerCharacter.h"
 #include "GraduationDesign/HUD/CharacterOverlayWidget.h"
 #include "GraduationDesign/HUD/PlayerHUD.h"
 
@@ -30,6 +31,28 @@ void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 		PlayerHUD->CharacterOverlay->HealthBar->SetPercent(HealthPercent);
 		FString HealthText=FString::Printf(TEXT("%d%"),FMath::CeilToInt(Health),FMath::CeilToInt(HealthPercent));
 		PlayerHUD->CharacterOverlay->HealthText->SetText(FText::FromString(HealthText));
+	}
+}
+
+void AMyPlayerController::SetHUDScore(float Score)
+{
+	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	bool bHUDValid=PlayerHUD&&PlayerHUD->CharacterOverlay&&	PlayerHUD->CharacterOverlay->ScoreAmount;
+	if(bHUDValid)
+	{
+		FString ScoreText=FString::Printf(TEXT("%d"),FMath::FloorToInt(Score));
+		PlayerHUD->CharacterOverlay->ScoreAmount->SetText(FText::FromString(ScoreText));
+	}
+}
+
+//修复服务端在死亡之后血条不刷新
+void AMyPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	APlayerCharacter* PlayerCharacter=Cast<APlayerCharacter>(InPawn);
+	if(PlayerCharacter)
+	{
+		SetHUDHealth(PlayerCharacter->GetHealth(),PlayerCharacter->GetMAXHealth());
 	}
 }
 

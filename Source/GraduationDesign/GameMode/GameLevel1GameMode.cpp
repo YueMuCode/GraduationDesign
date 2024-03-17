@@ -5,11 +5,21 @@
 
 #include "GameFramework/PlayerStart.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
+#include "GraduationDesign/PlayerState/PlayerPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
 void AGameLevel1GameMode::PlayerEliminated(APlayerCharacter* ElimmedCharacter, AMyPlayerController* victimController,
                                            AMyPlayerController* AttackerController)
 {
+	//记录攻击者的分数
+	APlayerPlayerState* AttackerPlayerstate=AttackerController?Cast<APlayerPlayerState>(AttackerController->PlayerState):nullptr;
+	APlayerPlayerState* VictimPlayerState=victimController?Cast<APlayerPlayerState>(victimController->PlayerState):nullptr;
+	if(AttackerPlayerstate&&AttackerPlayerstate!=VictimPlayerState)
+	{
+		AttackerPlayerstate->AddToScore(1.f);
+	}
+
+	
 	if(ElimmedCharacter)
 	{
 		ElimmedCharacter->Elim();

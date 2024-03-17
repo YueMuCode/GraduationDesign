@@ -19,6 +19,9 @@ class GRADUATIONDESIGN_API AMyPlayerController : public APlayerController
 public:
 	//血条数据
 	void SetHUDHealth(float Health,float MaxHealth);
+	//设置分数
+	void SetHUDScore(float Score);
+	virtual void OnPossess(APawn* InPawn) override;
 protected:
 	virtual  void BeginPlay() override;
 	//玩家血量
