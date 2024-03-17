@@ -11,6 +11,7 @@
 #include "GraduationDesign/PlayerComponent/CombatComponent.h"
 #include "GraduationDesign/TypeFiles/TurningInPlace.h"
 #include "Sound/SoundCue.h"
+#include "GraduationDesign/TypeFiles/CombatState.h"
 #include "PlayerCharacter.generated.h"
 
 UCLASS()
@@ -110,7 +111,10 @@ public:
 	void PollInit();
 	UPROPERTY()
 	class APlayerPlayerState* PlayerPlayerState;
-	
+
+	//获取combatstate以实现换弹功能
+	ECombatState GetCombatState() const;
+		
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -163,7 +167,7 @@ private:
 	class UWidgetComponent* OverheadWidget;
 
 	//自定义组件
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,meta=(AllowPrivateAccess="true"))
 	UCombatComponent* CombatComponent;
 
 	//RPC

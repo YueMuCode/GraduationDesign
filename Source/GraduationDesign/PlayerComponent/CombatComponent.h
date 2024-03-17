@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "GraduationDesign/HUD/PlayerHUD.h"
 #include "GraduationDesign/PlayerController/MyPlayerController.h"
+#include "GraduationDesign/TypeFiles/CombatState.h"
 #include "GraduationDesign/Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
@@ -53,6 +54,14 @@ protected:
 	void Reload();
 	UFUNCTION(Server,Reliable)
 	void ServerReload();
+	void HandleReload();
+	//用于刷新Reload状态
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
+
+
+
+	
 private:
 	APlayerCharacter* Character;
 
@@ -116,6 +125,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 StartingARAmmo=30;
 	void InitializeCarriedAmmo();
+
+	//装弹
+	UPROPERTY(ReplicatedUsing=OnRep_CombatState)
+	ECombatState CombatState=ECombatState::ECS_Unoccupied;
+
+	UFUNCTION()
+	void OnRep_CombatState();
 	
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);

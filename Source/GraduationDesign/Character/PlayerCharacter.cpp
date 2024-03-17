@@ -343,6 +343,8 @@ void APlayerCharacter::PollInit()
 	}
 }
 
+
+
 void APlayerCharacter::MoveForward(float value)
 {
 	if(Controller!=nullptr&&value!=0.f)
@@ -664,4 +666,10 @@ void APlayerCharacter::UpdateHUDHealth()
 		MyPlayerController->SetHUDHealth(Health,MaxHealth);
 	}
 
+}
+
+ECombatState APlayerCharacter::GetCombatState() const
+{
+	if(CombatComponent==nullptr)return ECombatState::ECS_MAX;
+	return CombatComponent->CombatState;
 }

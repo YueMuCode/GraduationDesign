@@ -86,4 +86,7 @@ void UPlayerAnimInstance::NativeUpdateAnimation(float DeltaTime)
 	}
 
 	TurningInPlace=PlayerCharacter->GetTurningInPlace();
+
+
+	bUseFABRIK=PlayerCharacter->GetCombatState()!=ECombatState::ECS_Reloading;
 }
