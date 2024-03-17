@@ -22,6 +22,7 @@ public:
 	//设置分数
 	void SetHUDScore(float Score);
 	void SetHUDDeafeats(int32 Defeats);
+	void SetHUDWeaponAmmo(int32 Ammo);
 	virtual void OnPossess(APawn* InPawn) override;
 protected:
 	virtual  void BeginPlay() override;

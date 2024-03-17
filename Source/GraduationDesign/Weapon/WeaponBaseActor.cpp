@@ -63,6 +63,7 @@ void AWeaponBaseActor::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWeaponBaseActor,WeaponState);
+	DOREPLIFETIME(AWeaponBaseActor,Ammo);
 }
 
 void AWeaponBaseActor::Tick(float DeltaTime)
@@ -141,6 +142,46 @@ void AWeaponBaseActor::OnRep_WeaponState()
 		break;
 	}
 }
+void AWeaponBaseActor::SpednRound()
+{
+	--Ammo;
+	SetHUDAmmo();
+}
+
+
+void AWeaponBaseActor::OnRep_Ammo()
+{
+	SetHUDAmmo();
+}
+
+void AWeaponBaseActor::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	if(Owner==nullptr)
+	{
+		PlayerOwnerCharacter=nullptr;
+		MyPlayerOwnerController=nullptr;
+	}
+	else
+	{
+		SetHUDAmmo();
+	}
+}
+
+void AWeaponBaseActor::SetHUDAmmo()
+{
+	PlayerOwnerCharacter=PlayerOwnerCharacter==nullptr?Cast<APlayerCharacter>(GetOwner()):PlayerOwnerCharacter;
+	if(PlayerOwnerCharacter)
+	{
+		MyPlayerOwnerController=MyPlayerOwnerController==nullptr?Cast<AMyPlayerController>(PlayerOwnerCharacter->Controller):MyPlayerOwnerController;
+		if(MyPlayerOwnerController)
+		{
+			MyPlayerOwnerController->SetHUDWeaponAmmo(Ammo);
+		}
+	}
+}
+
+
 //武器开火动画
 void AWeaponBaseActor::Fire(const FVector& HitTarget)
 {
@@ -162,6 +203,8 @@ void AWeaponBaseActor::Fire(const FVector& HitTarget)
 			}
 		}
 	}
+	//花费子弹
+	SpednRound();
 }
 //武器掉落
 void AWeaponBaseActor::Dropped()
@@ -171,6 +214,9 @@ void AWeaponBaseActor::Dropped()
 	FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld,true);
 	WeaponMesh->DetachFromComponent(DetachRules);
 	SetOwner(nullptr);
+	//处理捡起第二把武器，替换的情况
+	PlayerOwnerCharacter=nullptr;
+	MyPlayerOwnerController=nullptr;
 	
 }
 

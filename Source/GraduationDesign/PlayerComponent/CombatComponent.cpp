@@ -308,6 +308,13 @@ void UCombatComponent::Fire()
 void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 {
 	if(Character==nullptr||WeaponToEquip==nullptr)return;
+	//如果装备了武器就不能装备同样的第二把
+	if(EquippedWeapon)
+	{
+		EquippedWeapon->Dropped();
+	}
+
+	
 	EquippedWeapon=WeaponToEquip;
 	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);//设置武器的状态
 	//将武器附着在人物的骨骼上
@@ -317,7 +324,7 @@ void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 		HandSocket->AttachActor(EquippedWeapon,Character->GetMesh());
 	}
 	EquippedWeapon->SetOwner(Character);
-
+	EquippedWeapon->SetHUDAmmo();
 	//当持枪的时候，需要将视角锁定,并且跟随控制器旋转
 	Character->GetCharacterMovement()->bOrientRotationToMovement=false;
 	Character->bUseControllerRotationYaw=true;

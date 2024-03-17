@@ -83,6 +83,10 @@ public:
 	bool bAutomatic=true;
 	//玩家死亡之后掉落武器
 	void Dropped();
+
+	//子弹数量
+	virtual void OnRep_Owner() override;
+	void SetHUDAmmo();
 protected:
 
 private:
@@ -113,5 +117,18 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class ACasing> CasingClass;
 
-	
+	//这把武器的子弹容量
+	UPROPERTY(EditAnywhere,ReplicatedUsing=OnRep_Ammo)
+	int32 Ammo;
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	void SpednRound();
+	UPROPERTY(EditAnywhere)
+	int32 MagCapacity;
+
+	UPROPERTY()
+	class APlayerCharacter* PlayerOwnerCharacter;
+	UPROPERTY()
+	class AMyPlayerController* MyPlayerOwnerController;
 };

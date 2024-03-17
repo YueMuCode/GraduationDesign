@@ -177,6 +177,12 @@ void APlayerCharacter::PlayElimMontage()
 }
 void APlayerCharacter::MulticastElim_Implementation()
 {
+	//玩家死亡处理子弹显示
+	if(MyPlayerController)
+	{
+		MyPlayerController->SetHUDWeaponAmmo(0);
+	}
+	
 	bElimmed=true;
 	PlayElimMontage();
 	//如果设置了材质，在这里创建动态材质
