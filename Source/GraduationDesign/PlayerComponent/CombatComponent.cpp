@@ -310,6 +310,10 @@ void UCombatComponent::FireTimerFinished()
 	{
 		Fire();
 	}
+	if(EquippedWeapon->IsEmpty())
+	{
+		Reload();
+	}
 }
 
 void UCombatComponent::Fire()
@@ -366,7 +370,11 @@ void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 			EquippedWeapon->EquipSoundCue,
 			Character->GetActorLocation());
 	}
-	
+
+	if(EquippedWeapon->IsEmpty())
+	{
+		Reload();
+	}
 	//当持枪的时候，需要将视角锁定,并且跟随控制器旋转
 	Character->GetCharacterMovement()->bOrientRotationToMovement=false;
 	Character->bUseControllerRotationYaw=true;
