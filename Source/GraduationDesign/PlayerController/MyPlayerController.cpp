@@ -22,7 +22,9 @@ void AMyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	SetHUDTime();
+	CheckTimeSync(DeltaSeconds);
 }
+
 
 void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
@@ -101,13 +103,24 @@ void AMyPlayerController::SetHUDMatchCountdown(float CountDownTime)
 
 void AMyPlayerController::SetHUDTime()
 {
-	uint32 SecondsLeft=FMath::CeilToInt(MatchTime-GetWorld()->GetTimeSeconds());
+	uint32 SecondsLeft=FMath::CeilToInt(MatchTime-GetServerTime());
 	if(CountdownInt!=SecondsLeft)
 	{
-		SetHUDMatchCountdown(MatchTime-GetWorld()->GetTimeSeconds());
+		SetHUDMatchCountdown(MatchTime-GetServerTime());
 	}
 	CountdownInt=SecondsLeft;                                                                     
 }
+
+void AMyPlayerController::CheckTimeSync(float DeltaTime)
+{
+	TimeSyncRunningTime+=DeltaTime;
+	if(IsLocalController()&&TimeSyncRunningTime>TimeSyncFrequency)
+	{
+		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
+		TimeSyncRunningTime=0.f;
+	}
+}
+
 
 //修复服务端在死亡之后血条不刷新
 void AMyPlayerController::OnPossess(APawn* InPawn)
@@ -120,4 +133,38 @@ void AMyPlayerController::OnPossess(APawn* InPawn)
 	}
 }
 
+void AMyPlayerController::ServerRequestServerTime_Implementation(float TimeOfClientRequest)
+{
+	float ServerTimeOfReceipt=GetWorld()->GetTimeSeconds();
+	ClientReportServerTime(TimeOfClientRequest,ServerTimeOfReceipt);
+}
+
+void AMyPlayerController::ClientReportServerTime_Implementation(float TimeOfClientRequest,float TimeServerReceivedClientRequest)
+{
+	float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfClientRequest;
+	float SingleTripTime = 0.5f * RoundTripTime;
+	float CurrentServerTime = TimeServerReceivedClientRequest + SingleTripTime;
+	ClientServerDelta = CurrentServerTime - GetWorld()->GetTimeSeconds();
+	
+}
+
+float AMyPlayerController::GetServerTime()
+{
+	if (HasAuthority())
+	{
+		return GetWorld()->GetTimeSeconds();
+	}
+	else
+		return GetWorld()->GetTimeSeconds() + ClientServerDelta;
+}
+
+void AMyPlayerController::ReceivedPlayer()
+{
+	Super::ReceivedPlayer();
+	if(IsLocalController())
+	{
+		ServerRequestServerTime(GetWorld()->GetTimeSeconds());
+	}
+	
+}
 

@@ -27,9 +27,30 @@ public:
 	void SetHUDMatchCountdown(float CountDownTime);
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;
+
+	
+	virtual float GetServerTime();
+	virtual void ReceivedPlayer() override;
+	
 protected:
 	virtual  void BeginPlay() override;
 	void SetHUDTime();
+	
+	//同步客户端和服务器的时
+	UFUNCTION(Server,Reliable)
+	void ServerRequestServerTime(float TimeOfClientRequest);
+
+	UFUNCTION(Client,Reliable)
+	void ClientReportServerTime(float TimeOfClientRequest,float TimeServerReceivedClientRequest);
+
+	float ClientServerDelta=0.f;
+
+	UPROPERTY(EditAnywhere,Category=Time)
+	float TimeSyncFrequency=5.f;
+
+	float TimeSyncRunningTime=0.f;
+	void CheckTimeSync(float DeltaTime);
+	
 	//玩家血量
 	UPROPERTY()
 	APlayerHUD* PlayerHUD;
