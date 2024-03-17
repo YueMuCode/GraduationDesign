@@ -21,10 +21,12 @@ public:
 	void SetHUDHealth(float Health,float MaxHealth);
 	//设置分数
 	void SetHUDScore(float Score);
+	void SetHUDDeafeats(int32 Defeats);
 	virtual void OnPossess(APawn* InPawn) override;
 protected:
 	virtual  void BeginPlay() override;
 	//玩家血量
+	UPROPERTY()
 	APlayerHUD* PlayerHUD;
 	
 };

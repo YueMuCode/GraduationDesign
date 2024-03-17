@@ -107,6 +107,7 @@ public:
 
 	//初始化分数的UI（从0开始）
 	void PollInit();
+	UPROPERTY()
 	class APlayerPlayerState* PlayerPlayerState;
 	
 protected:
@@ -212,6 +213,7 @@ private:
 	UFUNCTION()
 	void OnRep_Health();
 
+	UPROPERTY()
 	AMyPlayerController*MyPlayerController;
 
 	

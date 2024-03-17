@@ -18,7 +18,10 @@ void AGameLevel1GameMode::PlayerEliminated(APlayerCharacter* ElimmedCharacter, A
 	{
 		AttackerPlayerstate->AddToScore(1.f);
 	}
-
+	if(VictimPlayerState)
+	{
+		VictimPlayerState->AddtoDefeats(1);
+	}
 	
 	if(ElimmedCharacter)
 	{

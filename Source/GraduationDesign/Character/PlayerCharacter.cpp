@@ -94,7 +94,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	HideCameraIfCharacterClose();
 
 	//初始化分数
-	PollInit();
+	//PollInit();//这个tick会大大增加游戏闪退的概率，所以，不要了，只是用来初始化的
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -311,6 +311,7 @@ void APlayerCharacter::PollInit()
 		if(PlayerPlayerState)
 		{
 			PlayerPlayerState->AddToScore(0.f);
+			PlayerPlayerState->AddtoDefeats(0);
 		}
 	}
 }
