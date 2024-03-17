@@ -292,7 +292,7 @@ void UCombatComponent::FireTimerFinished()
 
 void UCombatComponent::Fire()
 {
-	if(bCanFire)
+	if(CanFire())
 	{
 		bCanFire=false;
 		ServerFire(HitTarget);
@@ -328,4 +328,11 @@ void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 	//当持枪的时候，需要将视角锁定,并且跟随控制器旋转
 	Character->GetCharacterMovement()->bOrientRotationToMovement=false;
 	Character->bUseControllerRotationYaw=true;
+}
+
+
+bool UCombatComponent::CanFire()
+{
+	if(EquippedWeapon==nullptr)return false;
+	return !EquippedWeapon->IsEmpty()||!bCanFire;
 }

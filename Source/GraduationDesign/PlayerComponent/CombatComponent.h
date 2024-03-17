@@ -94,6 +94,10 @@ private:
 	void StartFireTimer();
 	void FireTimerFinished();
 	void Fire();
+
+	//处理子弹小于零仍旧能开火的情况
+	bool CanFire();
+	
 public:
 	void EquipWeapon( AWeaponBaseActor* WeaponToEquip);
 	

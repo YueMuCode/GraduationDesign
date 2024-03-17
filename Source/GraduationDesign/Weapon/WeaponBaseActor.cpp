@@ -144,7 +144,7 @@ void AWeaponBaseActor::OnRep_WeaponState()
 }
 void AWeaponBaseActor::SpednRound()
 {
-	--Ammo;
+	Ammo=FMath::Clamp(Ammo-1,0,MagCapacity);
 	SetHUDAmmo();
 }
 
@@ -179,6 +179,11 @@ void AWeaponBaseActor::SetHUDAmmo()
 			MyPlayerOwnerController->SetHUDWeaponAmmo(Ammo);
 		}
 	}
+}
+
+bool AWeaponBaseActor::IsEmpty()
+{
+	return Ammo<=0;
 }
 
 

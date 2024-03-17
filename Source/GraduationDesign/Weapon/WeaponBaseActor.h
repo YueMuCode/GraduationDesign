@@ -87,6 +87,9 @@ public:
 	//子弹数量
 	virtual void OnRep_Owner() override;
 	void SetHUDAmmo();
+
+	//处理子弹小于零的情况
+	bool IsEmpty();
 protected:
 
 private:
