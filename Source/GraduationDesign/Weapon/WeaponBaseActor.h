@@ -6,6 +6,7 @@
 #include "WeaponTypes.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
+#include "Sound/SoundCue.h"
 #include "WeaponBaseActor.generated.h"
 
 UENUM(BlueprintType)
@@ -97,6 +98,10 @@ public:
 	FORCEINLINE int32 GetAmmo()const {return Ammo;}
 	FORCEINLINE int32 GetMagCapacity()const {return MagCapacity;}
 	void AddAmmo(int32 AmmoToAdd);
+
+	//捡起武器音效
+	UPROPERTY(EditAnywhere)
+	USoundCue* EquipSoundCue;
 protected:
 
 private:

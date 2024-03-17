@@ -10,6 +10,7 @@
 #include "GraduationDesign/Weapon/WeaponBaseActor.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Sound/SoundCue.h"
 #define TRACE_LENGTH 80000;
 UCombatComponent::UCombatComponent()
 {
@@ -101,6 +102,14 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		}
 		Character->GetCharacterMovement()->bOrientRotationToMovement=false;
 		Character->bUseControllerRotationYaw=true;
+
+		if(EquippedWeapon->EquipSoundCue)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
+				this,
+				EquippedWeapon->EquipSoundCue,
+				Character->GetActorLocation());
+		}
 	}
 }
 
@@ -349,6 +358,15 @@ void UCombatComponent::EquipWeapon(AWeaponBaseActor* WeaponToEquip)
 	{
 		Controller->SetHUDCarriedAmmo(CarriedAmmo);
 	}
+	//捡起武器的声音
+	if(EquippedWeapon->EquipSoundCue)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			EquippedWeapon->EquipSoundCue,
+			Character->GetActorLocation());
+	}
+	
 	//当持枪的时候，需要将视角锁定,并且跟随控制器旋转
 	Character->GetCharacterMovement()->bOrientRotationToMovement=false;
 	Character->bUseControllerRotationYaw=true;
