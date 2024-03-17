@@ -59,7 +59,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
 
-
+	//换弹逻辑
+	int32 AmountToReload();
+	void UpdateAmmoValues();
 
 	
 private:

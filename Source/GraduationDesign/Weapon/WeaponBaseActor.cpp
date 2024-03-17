@@ -186,6 +186,12 @@ bool AWeaponBaseActor::IsEmpty()
 	return Ammo<=0;
 }
 
+void AWeaponBaseActor::AddAmmo(int32 AmmoToAdd)
+{
+	Ammo=FMath::Clamp(Ammo-AmmoToAdd,0,MagCapacity);
+	SetHUDAmmo();
+}
+
 
 //武器开火动画
 void AWeaponBaseActor::Fire(const FVector& HitTarget)
