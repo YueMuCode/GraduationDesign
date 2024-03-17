@@ -17,6 +17,13 @@ void AMyPlayerController::BeginPlay()
 	GetHUD();
 	PlayerHUD=Cast<APlayerHUD>(GetHUD());
 }
+
+void AMyPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	SetHUDTime();
+}
+
 void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 {
 	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
@@ -78,6 +85,30 @@ void AMyPlayerController::SetHUDCarriedAmmo(int32 Ammo)
 	}
 }
 
+void AMyPlayerController::SetHUDMatchCountdown(float CountDownTime)
+{
+	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	bool bHUDValid=PlayerHUD&&PlayerHUD->CharacterOverlay&&	PlayerHUD->CharacterOverlay->MatchCountdownText;
+	if(bHUDValid)
+	{
+		int32 Minutes=FMath::FloorToInt(CountDownTime/60.f);
+		int32 Seconds=CountDownTime-Minutes*60;
+		
+		FString CountdownText=FString::Printf(TEXT("%02d:%02d"),Minutes,Seconds);
+		PlayerHUD->CharacterOverlay->MatchCountdownText->SetText(FText::FromString(CountdownText));
+	}
+}
+
+void AMyPlayerController::SetHUDTime()
+{
+	uint32 SecondsLeft=FMath::CeilToInt(MatchTime-GetWorld()->GetTimeSeconds());
+	if(CountdownInt!=SecondsLeft)
+	{
+		SetHUDMatchCountdown(MatchTime-GetWorld()->GetTimeSeconds());
+	}
+	CountdownInt=SecondsLeft;                                                                     
+}
+
 //修复服务端在死亡之后血条不刷新
 void AMyPlayerController::OnPossess(APawn* InPawn)
 {
@@ -88,4 +119,5 @@ void AMyPlayerController::OnPossess(APawn* InPawn)
 		SetHUDHealth(PlayerCharacter->GetHealth(),PlayerCharacter->GetMAXHealth());
 	}
 }
+
 

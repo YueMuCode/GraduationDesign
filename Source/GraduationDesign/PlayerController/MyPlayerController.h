@@ -24,11 +24,19 @@ public:
 	void SetHUDDeafeats(int32 Defeats);
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDCarriedAmmo(int32 Ammo);
+	void SetHUDMatchCountdown(float CountDownTime);
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void Tick(float DeltaSeconds) override;
 protected:
 	virtual  void BeginPlay() override;
+	void SetHUDTime();
 	//玩家血量
 	UPROPERTY()
 	APlayerHUD* PlayerHUD;
+	
+	float MatchTime=120.f;
+	uint32 CountdownInt=0;
+private:
+	
 	
 };
