@@ -49,7 +49,8 @@ void APlayerHUD::DrawHUD()
 void APlayerHUD::BeginPlay()
 {
 	Super::BeginPlay();
-	AddCharacterOverlay();
+	//当游戏热身时间结束才会出现
+	//AddCharacterOverlay();
 }
 
 void APlayerHUD::AddCharacterOverlay()

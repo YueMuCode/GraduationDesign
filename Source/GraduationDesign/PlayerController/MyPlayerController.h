@@ -27,10 +27,12 @@ public:
 	void SetHUDMatchCountdown(float CountDownTime);
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	virtual float GetServerTime();
 	virtual void ReceivedPlayer() override;
+
+	void OnMatchStateSet(FName State);
 	
 protected:
 	virtual  void BeginPlay() override;
@@ -57,7 +59,25 @@ protected:
 	
 	float MatchTime=120.f;
 	uint32 CountdownInt=0;
+
+	
+	void PollInit();
 private:
 	
-	
+	//匹配状态
+	UPROPERTY(ReplicatedUsing=OnRep_MatchState)
+	FName MatchState;
+
+	UFUNCTION()
+	void OnRep_MatchState();
+
+	UPROPERTY()
+	class UCharacterOverlayWidget* CharacterOverlayWidget;
+	bool bInitializeCharacterOverlay=false;
+
+	float HUDHealth;
+	float HUDMaxHealth;
+	float HUDScore;
+	int32 HUDDEfeats;
+
 };

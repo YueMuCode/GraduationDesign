@@ -35,6 +35,23 @@ void AGameLevel1GameMode::Tick(float DeltaTime)
 	}
 }
 
+void AGameLevel1GameMode::OnMatchStateSet()
+{
+	Super::OnMatchStateSet();
+
+	for(FConstPlayerControllerIterator It=GetWorld()->GetPlayerControllerIterator();It;It++)
+	{
+		AMyPlayerController*MyPlayerController=Cast<AMyPlayerController>(*It);
+		if(MyPlayerController)
+		{
+			MyPlayerController->OnMatchStateSet(MatchState);
+		}
+		
+	}
+}
+
+
+
 void AGameLevel1GameMode::PlayerEliminated(APlayerCharacter* ElimmedCharacter, AMyPlayerController* victimController,
                                            AMyPlayerController* AttackerController)
 {

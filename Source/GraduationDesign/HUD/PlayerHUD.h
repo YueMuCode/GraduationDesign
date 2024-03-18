@@ -38,13 +38,15 @@ public:
 	FORCEINLINE void SetHUDPackage(const FHUDPackage&Package){HUDPackage=Package;}
 
 	//玩家血量
+	UPROPERTY()
 	class UCharacterOverlayWidget* CharacterOverlay;
 	UPROPERTY(EditAnywhere,Category="Player Stats")
 	TSubclassOf< UUserWidget> CharacterOverlayClass;
 
+	void AddCharacterOverlay();
 protected:
 	virtual void BeginPlay() override;
-	void AddCharacterOverlay();
+
 private:
 	//绘制武器准心
 	FHUDPackage HUDPackage;

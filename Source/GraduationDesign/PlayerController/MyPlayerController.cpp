@@ -5,9 +5,11 @@
 
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/GameMode.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
 #include "GraduationDesign/HUD/CharacterOverlayWidget.h"
 #include "GraduationDesign/HUD/PlayerHUD.h"
+#include "Net/UnrealNetwork.h"
 
 void AMyPlayerController::BeginPlay()
 {
@@ -18,12 +20,20 @@ void AMyPlayerController::BeginPlay()
 	PlayerHUD=Cast<APlayerHUD>(GetHUD());
 }
 
+void AMyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AMyPlayerController,MatchState);
+}
+
 void AMyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	SetHUDTime();
 	CheckTimeSync(DeltaSeconds);
+	PollInit();
 }
+
 
 
 void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
@@ -41,6 +51,12 @@ void AMyPlayerController::SetHUDHealth(float Health, float MaxHealth)
 		FString HealthText=FString::Printf(TEXT("%d%"),FMath::CeilToInt(Health),FMath::CeilToInt(HealthPercent));
 		PlayerHUD->CharacterOverlay->HealthText->SetText(FText::FromString(HealthText));
 	}
+	else
+	{
+		bInitializeCharacterOverlay=true;
+		HUDHealth=Health;
+		HUDMaxHealth=MaxHealth;
+	}
 }
 
 void AMyPlayerController::SetHUDScore(float Score)
@@ -52,6 +68,11 @@ void AMyPlayerController::SetHUDScore(float Score)
 		FString ScoreText=FString::Printf(TEXT("%d"),FMath::FloorToInt(Score));
 		PlayerHUD->CharacterOverlay->ScoreAmount->SetText(FText::FromString(ScoreText));
 	}
+	else
+	{
+		bInitializeCharacterOverlay=true;
+		HUDScore=Score;
+	}
 }
 
 void AMyPlayerController::SetHUDDeafeats(int32 Defeats)
@@ -62,6 +83,11 @@ void AMyPlayerController::SetHUDDeafeats(int32 Defeats)
 	{
 		FString DefeatsText=FString::Printf(TEXT("%d"),Defeats);
 		PlayerHUD->CharacterOverlay->DefeatsAmount->SetText(FText::FromString(DefeatsText));
+	}
+	else
+	{
+		bInitializeCharacterOverlay=true;
+		HUDDEfeats=Defeats;
 	}
 }
 
@@ -122,6 +148,7 @@ void AMyPlayerController::CheckTimeSync(float DeltaTime)
 }
 
 
+
 //修复服务端在死亡之后血条不刷新
 void AMyPlayerController::OnPossess(APawn* InPawn)
 {
@@ -168,3 +195,45 @@ void AMyPlayerController::ReceivedPlayer()
 	
 }
 
+void AMyPlayerController::OnMatchStateSet(FName State)
+{
+	MatchState=State;
+	if(MatchState==MatchState::InProgress)
+	{
+		PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+		if(PlayerHUD)
+		{
+			PlayerHUD->AddCharacterOverlay();//热身时间结束，就显示UI
+		}
+	}
+}
+
+
+void AMyPlayerController::OnRep_MatchState()
+{
+	if(MatchState==MatchState::InProgress)
+	{
+		PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+		if(PlayerHUD)
+		{
+			PlayerHUD->AddCharacterOverlay();//热身时间结束，就显示UI
+		}
+	}
+}
+
+void AMyPlayerController::PollInit()
+{
+	if(CharacterOverlayWidget==nullptr)
+	{
+		if(PlayerHUD&&PlayerHUD->CharacterOverlay)
+		{
+			CharacterOverlayWidget=PlayerHUD->CharacterOverlay;
+			if(CharacterOverlayWidget)
+			{
+				SetHUDHealth(HUDHealth,HUDMaxHealth);
+				SetHUDScore(HUDScore);
+				SetHUDDeafeats(HUDDEfeats);
+			}
+		}
+	}
+}
