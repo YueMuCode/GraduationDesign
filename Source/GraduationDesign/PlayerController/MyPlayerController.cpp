@@ -7,6 +7,7 @@
 #include "Components/TextBlock.h"
 #include "GameFramework/GameMode.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
+#include "GraduationDesign/HUD/AnnouncementWidget.h"
 #include "GraduationDesign/HUD/CharacterOverlayWidget.h"
 #include "GraduationDesign/HUD/PlayerHUD.h"
 #include "Net/UnrealNetwork.h"
@@ -18,6 +19,10 @@ void AMyPlayerController::BeginPlay()
 	//玩家血量
 	GetHUD();
 	PlayerHUD=Cast<APlayerHUD>(GetHUD());
+	if(PlayerHUD)
+	{
+		PlayerHUD->AddAnnouncement();
+	}
 }
 
 void AMyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -198,13 +203,15 @@ void AMyPlayerController::ReceivedPlayer()
 void AMyPlayerController::OnMatchStateSet(FName State)
 {
 	MatchState=State;
+	if(MatchState==MatchState::WaitingToStart)
+	{
+		
+	}
+
+	
 	if(MatchState==MatchState::InProgress)
 	{
-		PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
-		if(PlayerHUD)
-		{
-			PlayerHUD->AddCharacterOverlay();//热身时间结束，就显示UI
-		}
+		HandleMatchHasStarted();
 	}
 }
 
@@ -213,10 +220,19 @@ void AMyPlayerController::OnRep_MatchState()
 {
 	if(MatchState==MatchState::InProgress)
 	{
-		PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
-		if(PlayerHUD)
+		HandleMatchHasStarted();
+	}
+}
+
+void AMyPlayerController::HandleMatchHasStarted()
+{
+	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD)
+	{
+		PlayerHUD->AddCharacterOverlay();//热身时间结束，就显示UI
+		if(PlayerHUD->Announcement)
 		{
-			PlayerHUD->AddCharacterOverlay();//热身时间结束，就显示UI
+			PlayerHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }

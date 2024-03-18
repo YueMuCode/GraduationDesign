@@ -31,8 +31,10 @@ public:
 	
 	virtual float GetServerTime();
 	virtual void ReceivedPlayer() override;
+	
 
 	void OnMatchStateSet(FName State);
+	void HandleMatchHasStarted();
 	
 protected:
 	virtual  void BeginPlay() override;

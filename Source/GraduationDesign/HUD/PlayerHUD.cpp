@@ -3,6 +3,7 @@
 
 #include "PlayerHUD.h"
 
+#include "AnnouncementWidget.h"
 #include "CharacterOverlayWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PlayerController.h"
@@ -51,6 +52,7 @@ void APlayerHUD::BeginPlay()
 	Super::BeginPlay();
 	//当游戏热身时间结束才会出现
 	//AddCharacterOverlay();
+	
 }
 
 void APlayerHUD::AddCharacterOverlay()
@@ -60,6 +62,16 @@ void APlayerHUD::AddCharacterOverlay()
 	{
 		CharacterOverlay=CreateWidget<UCharacterOverlayWidget>(PlayerController,CharacterOverlayClass);
 		CharacterOverlay->AddToViewport();
+	}
+}
+
+void APlayerHUD::AddAnnouncement()
+{
+	APlayerController* PlayerController=GetOwningPlayerController();
+	if(PlayerController&&AnnouncementClass)
+	{
+		Announcement=CreateWidget<UAnnouncementWidget>(PlayerController,AnnouncementClass);
+		Announcement->AddToViewport();
 	}
 }
 

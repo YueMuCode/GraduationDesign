@@ -42,8 +42,21 @@ public:
 	class UCharacterOverlayWidget* CharacterOverlay;
 	UPROPERTY(EditAnywhere,Category="Player Stats")
 	TSubclassOf< UUserWidget> CharacterOverlayClass;
+	
+	UPROPERTY(EditAnywhere,Category="Announcement")
+	TSubclassOf<UUserWidget> AnnouncementClass;
 
+	UPROPERTY()
+	class UAnnouncementWidget* Announcement;
+	
 	void AddCharacterOverlay();
+	
+	void AddAnnouncement();
+
+
+
+
+	
 protected:
 	virtual void BeginPlay() override;
 
