@@ -8,6 +8,33 @@
 #include "GraduationDesign/PlayerState/PlayerPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
+AGameLevel1GameMode::AGameLevel1GameMode()
+{
+	bDelayedStart=true;//等待游戏开始的状态，完成会变得没有网格体，在空中飞来飞去
+}
+
+
+void AGameLevel1GameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	LevelStartingTime=GetWorld()->GetTimeSeconds();
+}
+
+
+void AGameLevel1GameMode::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if(MatchState==MatchState::WaitingToStart)
+	{
+		CountdownTime=WarmupTime-GetWorld()->GetTimeSeconds()+LevelStartingTime;
+		if(CountdownTime<=0.f)
+		{
+			StartMatch();
+		}
+	}
+}
+
 void AGameLevel1GameMode::PlayerEliminated(APlayerCharacter* ElimmedCharacter, AMyPlayerController* victimController,
                                            AMyPlayerController* AttackerController)
 {
