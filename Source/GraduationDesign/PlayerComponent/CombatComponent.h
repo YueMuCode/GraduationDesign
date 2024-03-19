@@ -23,6 +23,7 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;//系统提供的函数，指定对应的变量进行复制
+	void FireButtonPressed(bool bPressed);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -34,7 +35,7 @@ protected:
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
 
-	void FireButtonPressed(bool bPressed);
+	
 
 	//实现开火动画的RPC
 	UFUNCTION(Server,Reliable)

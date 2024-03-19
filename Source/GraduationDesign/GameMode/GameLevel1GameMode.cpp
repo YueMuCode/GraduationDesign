@@ -8,6 +8,12 @@
 #include "GraduationDesign/PlayerState/PlayerPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 
+namespace MatchState
+{
+	const FName Cooldown=FName("Cooldown");
+}
+
+
 AGameLevel1GameMode::AGameLevel1GameMode()
 {
 	bDelayedStart=true;//等待游戏开始的状态，完成会变得没有网格体，在空中飞来飞去
@@ -31,6 +37,26 @@ void AGameLevel1GameMode::Tick(float DeltaTime)
 		if(CountdownTime<=0.f)
 		{
 			StartMatch();
+		}
+	}
+	else if(MatchState==MatchState::InProgress)
+	{
+		CountdownTime = WarmupTime + MatchTime - GetWorld()->GetTimeSeconds() + LevelStartingTime;
+		if (CountdownTime <= 0.f)
+		{
+			SetMatchState(MatchState::Cooldown);
+		}
+		if(CountdownTime<=0.f)
+		{
+			SetMatchState(MatchState::Cooldown);
+		}
+	}
+	else if(MatchState==MatchState::Cooldown)
+	{
+		CountdownTime=CooldownTime+WarmupTime+MatchTime-GetWorld()->GetTimeSeconds()+LevelStartingTime;
+		if(CountdownTime<=0.f)
+		{
+			RestartGame();
 		}
 	}
 }

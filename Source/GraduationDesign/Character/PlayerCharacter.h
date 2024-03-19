@@ -114,7 +114,14 @@ public:
 
 	//获取combatstate以实现换弹功能
 	ECombatState GetCombatState() const;
-		
+
+	UPROPERTY(Replicated)
+	bool bDisableGameplay=false;
+
+	FORCEINLINE UCombatComponent* GetCombat() const{return CombatComponent;}
+	FORCEINLINE bool GetDisableGamePlay() const {return bDisableGameplay;}
+
+	
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
@@ -141,7 +148,7 @@ protected:
 	//更新HPUI
 	void UpdateHUDHealth();
 
-
+	void RotateInPlace(float DeltaTime);
 
 
 

@@ -121,6 +121,12 @@ void AMyPlayerController::SetHUDMatchCountdown(float CountDownTime)
 	bool bHUDValid=PlayerHUD&&PlayerHUD->CharacterOverlay&&	PlayerHUD->CharacterOverlay->MatchCountdownText;
 	if(bHUDValid)
 	{
+		if(CountDownTime<0.f)
+		{
+			PlayerHUD->CharacterOverlay->MatchCountdownText->SetText(FText());
+			return;
+		}
+		
 		int32 Minutes=FMath::FloorToInt(CountDownTime/60.f);
 		int32 Seconds=CountDownTime-Minutes*60;
 		
@@ -135,6 +141,12 @@ void AMyPlayerController::SetHUDAnnouncementCountdown(float CountdownTime)
 	bool bHUDValid=PlayerHUD&&PlayerHUD->Announcement&&	PlayerHUD->Announcement->WarmupTime;
 	if(bHUDValid)
 	{
+		if(CountdownTime<0.f)
+		{
+			PlayerHUD->Announcement->WarmupTime->SetText(FText());
+			return;
+		}
+		
 		int32 Minutes=FMath::FloorToInt(CountdownTime/60.f);
 		int32 Seconds=CountdownTime-Minutes*60;
 		
@@ -148,10 +160,21 @@ void AMyPlayerController::SetHUDTime()
 	float TimeLeft=0.f;
 	if(MatchState==MatchState::WaitingToStart) TimeLeft=WarmupTime-GetServerTime()+LevelStartingTime;
 	else if(MatchState==MatchState::InProgress) TimeLeft=WarmupTime+MatchTime-GetServerTime()+LevelStartingTime;
+	else if(MatchState==MatchState::Cooldown) TimeLeft=CooldownTime+ WarmupTime+MatchTime-GetServerTime()+LevelStartingTime;
 	uint32 SecondsLeft=FMath::CeilToInt(TimeLeft);
+
+	if(HasAuthority())
+	{
+		GameLevel1GameMode=GameLevel1GameMode==nullptr?Cast<AGameLevel1GameMode>(UGameplayStatics::GetGameMode(this)):GameLevel1GameMode;
+		if(GameLevel1GameMode)
+		{
+			SecondsLeft=FMath::CeilToInt(GameLevel1GameMode->GetCountdownTime()+LevelStartingTime);
+		}
+	}
+	
 	if(CountdownInt!=SecondsLeft)
 	{
-		if(MatchState==MatchState::WaitingToStart)
+		if(MatchState==MatchState::WaitingToStart||MatchState==MatchState::Cooldown)
 		{
 			SetHUDAnnouncementCountdown(TimeLeft);
 		}
@@ -225,15 +248,13 @@ void AMyPlayerController::ReceivedPlayer()
 void AMyPlayerController::OnMatchStateSet(FName State)
 {
 	MatchState=State;
-	if(MatchState==MatchState::WaitingToStart)
-	{
-		
-	}
-
-	
 	if(MatchState==MatchState::InProgress)
 	{
 		HandleMatchHasStarted();
+	}
+	else if(MatchState==MatchState::Cooldown)
+	{
+		HandleCooldown();
 	}
 }
 
@@ -243,6 +264,10 @@ void AMyPlayerController::OnRep_MatchState()
 	if(MatchState==MatchState::InProgress)
 	{
 		HandleMatchHasStarted();
+	}
+	else if(MatchState==MatchState::Cooldown)
+	{
+		HandleCooldown();
 	}
 }
 
@@ -257,6 +282,32 @@ void AMyPlayerController::HandleMatchHasStarted()
 			PlayerHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void AMyPlayerController::HandleCooldown()
+{
+	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	if(PlayerHUD)
+	{
+		PlayerHUD->CharacterOverlay->RemoveFromParent();
+		bool bHUDValid=PlayerHUD->Announcement&&PlayerHUD->Announcement->AnnouncementText&&PlayerHUD->Announcement->InfoText;
+		if(bHUDValid)
+		{
+			PlayerHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
+			FString AnnouncementText(("new Game Starts in"));
+			PlayerHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
+			PlayerHUD->Announcement->InfoText->SetText(FText());
+			PlayerHUD->Announcement->AnnouncementText_1->SetText((FText()));
+		}
+	}
+	
+	APlayerCharacter*PlayerCharacter=Cast<APlayerCharacter>(GetPawn());
+	if(PlayerCharacter&&PlayerCharacter->GetCombat())
+	{
+		PlayerCharacter->bDisableGameplay=true;
+		PlayerCharacter->GetCombat()->FireButtonPressed(false);
+	}
+	
 }
 
 void AMyPlayerController::PollInit()
@@ -284,24 +335,28 @@ void AMyPlayerController::ServerCheckMatchState_Implementation()
 	{
 		WarmupTime=GameMode->WarmupTime;
 		MatchTime=GameMode->MatchTime;
+		CooldownTime=GameMode->CooldownTime;
 		LevelStartingTime=GameMode->LevelStartingTime;
 		MatchState=GameMode->GetMatchState();
-		ClientJoinMidgame(MatchState,WarmupTime,MatchTime,LevelStartingTime);
+		ClientJoinMidgame(MatchState,WarmupTime,MatchTime,CooldownTime, LevelStartingTime);
 		// if(PlayerHUD&&MatchState==MatchState::WaitingToStart)
 		// {
 		// 	PlayerHUD->AddAnnouncement();
 		// }
 	}
 }
-void AMyPlayerController::ClientJoinMidgame_Implementation(FName StateOfMatch,float Warmup,float Match,float StartingTime)
+void AMyPlayerController::ClientJoinMidgame_Implementation(FName StateOfMatch,float Warmup,float Match,float Cooldown,float StartingTime)
 {
 	WarmupTime=Warmup;
 	MatchTime=Match;
+	CooldownTime=Cooldown;
 	LevelStartingTime=StartingTime;
 	MatchState=StateOfMatch;
+	
 	OnMatchStateSet(MatchState);
 	if(PlayerHUD&&MatchState==MatchState::WaitingToStart)
 	{
 		PlayerHUD->AddAnnouncement();
 	}
+	
 }

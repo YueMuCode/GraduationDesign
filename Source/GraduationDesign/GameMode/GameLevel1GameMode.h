@@ -6,9 +6,16 @@
 #include "GameFramework/GameMode.h"
 #include "GameLevel1GameMode.generated.h"
 
+
+namespace MatchState
+{
+	extern GRADUATIONDESIGN_API const  FName Cooldown;
+}
 /**
  * 
  */
+
+
 UCLASS()
 class GRADUATIONDESIGN_API AGameLevel1GameMode : public AGameMode
 {
@@ -23,6 +30,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float MatchTime=120.f;
 
+	UPROPERTY(EditDefaultsOnly)
+	float CooldownTime=10.f;
 	
 	float LevelStartingTime=0.f;
 
@@ -35,6 +44,7 @@ public:
 	//通知重生
 	virtual void RequestRespawn(ACharacter* ElimmedCharacter,AController*ElimmedController);
 
+	FORCEINLINE float GetCountdownTime() const {return CountdownTime;}
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnMatchStateSet() override;

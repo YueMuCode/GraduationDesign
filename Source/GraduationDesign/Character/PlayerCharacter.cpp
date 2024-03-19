@@ -78,6 +78,23 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	RotateInPlace(DeltaTime);
+	
+	HideCameraIfCharacterClose();
+
+	//初始化分数
+	//PollInit();//这个tick会大大增加游戏闪退的概率，所以，不要了，只是用来初始化的
+}
+
+void APlayerCharacter::RotateInPlace(float DeltaTime)
+{
+	if(bDisableGameplay)
+	{
+		bUseControllerRotationYaw=false;
+		TurningInPlace=ETurningInPlace::ETIP_NotTurning;
+		return;
+	}
 	if(GetLocalRole()>ROLE_SimulatedProxy&&IsLocallyViewed())
 	{
 		AimOffset(DeltaTime);
@@ -91,10 +108,6 @@ void APlayerCharacter::Tick(float DeltaTime)
 		}
 		CalculateAO_Pitch();
 	}
-	HideCameraIfCharacterClose();
-
-	//初始化分数
-	//PollInit();//这个tick会大大增加游戏闪退的概率，所以，不要了，只是用来初始化的
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -123,6 +136,7 @@ void APlayerCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(APlayerCharacter,OverlapWeapon,COND_OwnerOnly);//对OverlapWeapon进行复制，类型为拥有该对象的客户端（通常是服务器）才会复制这个属性
 	DOREPLIFETIME(APlayerCharacter,Health);
+	DOREPLIFETIME(APlayerCharacter,bDisableGameplay);
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -221,10 +235,7 @@ void APlayerCharacter::MulticastElim_Implementation()
 	//修改玩家死亡之后的碰撞等属性
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->StopMovementImmediately();
-	if(MyPlayerController)
-	{
-		DisableInput(MyPlayerController);
-	}
+	bDisableGameplay=true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
@@ -256,6 +267,10 @@ void APlayerCharacter::Destroyed()
 	if(ElimBotComponent)
 	{
 		ElimBotComponent->DestroyComponent();
+	}
+	if(CombatComponent&&CombatComponent->EquippedWeapon)
+	{
+		CombatComponent->EquippedWeapon->Destroy();
 	}
 }
 
@@ -347,6 +362,7 @@ void APlayerCharacter::PollInit()
 
 void APlayerCharacter::MoveForward(float value)
 {
+	if(bDisableGameplay	)return;
 	if(Controller!=nullptr&&value!=0.f)
 	{
 		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
@@ -356,6 +372,7 @@ void APlayerCharacter::MoveForward(float value)
 }
 void APlayerCharacter::MoveRight(float value)
 {
+	if(bDisableGameplay	)return;
 	if(Controller!=nullptr&&value!=0.f)
 	{
 		const FRotator YawRotation(0.f,Controller->GetControlRotation().Yaw,0.f);
@@ -373,6 +390,7 @@ void APlayerCharacter::LookUp(float value)
 }
 void APlayerCharacter::EquipButtonPressed()
 {
+	if(bDisableGameplay	)return;
 	//
 	if(CombatComponent)
 	{
@@ -388,6 +406,7 @@ void APlayerCharacter::EquipButtonPressed()
 }
 void APlayerCharacter::CrouchButtonPressed()
 {
+	if(bDisableGameplay	)return;
 	if(bIsCrouched)
 	{
 		UnCrouch();
@@ -400,6 +419,7 @@ void APlayerCharacter::CrouchButtonPressed()
 }
 void APlayerCharacter::AimButtonPressed()
 {
+	if(bDisableGameplay	)return;
 	if(CombatComponent)
 	{
 		CombatComponent->SetAiming(true);
@@ -407,6 +427,7 @@ void APlayerCharacter::AimButtonPressed()
 }
 void APlayerCharacter::AimButtonReleased()
 {
+	if(bDisableGameplay	)return;
 	if(CombatComponent)
 	{
 		CombatComponent->SetAiming(false);
@@ -414,6 +435,7 @@ void APlayerCharacter::AimButtonReleased()
 }
 void APlayerCharacter::Jump()
 {
+	if(bDisableGameplay)return;
 
 	if(bIsCrouched)
 	{
@@ -426,6 +448,7 @@ void APlayerCharacter::Jump()
 }
 void APlayerCharacter::FireButtonPressed()
 {
+	if(bDisableGameplay	)return;
 	if(CombatComponent)
 	{
 		CombatComponent->FireButtonPressed(true);
@@ -433,6 +456,7 @@ void APlayerCharacter::FireButtonPressed()
 }
 void APlayerCharacter::FireButtonReleased()
 {
+	if(bDisableGameplay	)return;
 	if(CombatComponent)
 	{
 		CombatComponent->FireButtonPressed(false);
@@ -441,6 +465,7 @@ void APlayerCharacter::FireButtonReleased()
 
 void APlayerCharacter::ReloadButtonPressed()
 {
+	if(bDisableGameplay	)return;
 	if(CombatComponent)
 	{
 		CombatComponent->Reload();
@@ -551,6 +576,7 @@ bool APlayerCharacter::IsWeaponEquipped()
 
 bool APlayerCharacter::IsAiming()
 {
+	
 	return (CombatComponent&&CombatComponent->bAiming);
 }
 
@@ -667,6 +693,8 @@ void APlayerCharacter::UpdateHUDHealth()
 	}
 
 }
+
+
 
 ECombatState APlayerCharacter::GetCombatState() const
 {

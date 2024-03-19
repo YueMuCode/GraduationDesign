@@ -20,4 +20,8 @@ public:
 	UTextBlock*InfoText;
 	UPROPERTY(meta=(BindWidget))
 	UTextBlock*AnnouncementText;
+
+	UPROPERTY(meta=(BindWidget))
+	UTextBlock*AnnouncementText_1;
+	
 };
