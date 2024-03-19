@@ -7,22 +7,19 @@
 #include "Components/TextBlock.h"
 #include "GameFramework/GameMode.h"
 #include "GraduationDesign/Character/PlayerCharacter.h"
+#include "GraduationDesign/GameMode/GameLevel1GameMode.h"
 #include "GraduationDesign/HUD/AnnouncementWidget.h"
 #include "GraduationDesign/HUD/CharacterOverlayWidget.h"
 #include "GraduationDesign/HUD/PlayerHUD.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
-
 	//玩家血量
-	GetHUD();
 	PlayerHUD=Cast<APlayerHUD>(GetHUD());
-	if(PlayerHUD)
-	{
-		PlayerHUD->AddAnnouncement();
-	}
+	ServerCheckMatchState();
 }
 
 void AMyPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -132,13 +129,38 @@ void AMyPlayerController::SetHUDMatchCountdown(float CountDownTime)
 	}
 }
 
+void AMyPlayerController::SetHUDAnnouncementCountdown(float CountdownTime)
+{
+	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
+	bool bHUDValid=PlayerHUD&&PlayerHUD->Announcement&&	PlayerHUD->Announcement->WarmupTime;
+	if(bHUDValid)
+	{
+		int32 Minutes=FMath::FloorToInt(CountdownTime/60.f);
+		int32 Seconds=CountdownTime-Minutes*60;
+		
+		FString CountdownText=FString::Printf(TEXT("%02d:%02d"),Minutes,Seconds);
+		PlayerHUD->Announcement->WarmupTime->SetText(FText::FromString(CountdownText));
+	}
+}
+
 void AMyPlayerController::SetHUDTime()
 {
-	uint32 SecondsLeft=FMath::CeilToInt(MatchTime-GetServerTime());
+	float TimeLeft=0.f;
+	if(MatchState==MatchState::WaitingToStart) TimeLeft=WarmupTime-GetServerTime()+LevelStartingTime;
+	else if(MatchState==MatchState::InProgress) TimeLeft=WarmupTime+MatchTime-GetServerTime()+LevelStartingTime;
+	uint32 SecondsLeft=FMath::CeilToInt(TimeLeft);
 	if(CountdownInt!=SecondsLeft)
 	{
-		SetHUDMatchCountdown(MatchTime-GetServerTime());
+		if(MatchState==MatchState::WaitingToStart)
+		{
+			SetHUDAnnouncementCountdown(TimeLeft);
+		}
+		if(MatchState==MatchState::InProgress)
+		{
+			SetHUDMatchCountdown(TimeLeft);
+		}
 	}
+	
 	CountdownInt=SecondsLeft;                                                                     
 }
 
@@ -251,5 +273,35 @@ void AMyPlayerController::PollInit()
 				SetHUDDeafeats(HUDDEfeats);
 			}
 		}
+	}
+}
+
+
+void AMyPlayerController::ServerCheckMatchState_Implementation()
+{
+	AGameLevel1GameMode*GameMode=Cast<AGameLevel1GameMode>(UGameplayStatics::GetGameMode(this));
+	if(GameMode)
+	{
+		WarmupTime=GameMode->WarmupTime;
+		MatchTime=GameMode->MatchTime;
+		LevelStartingTime=GameMode->LevelStartingTime;
+		MatchState=GameMode->GetMatchState();
+		ClientJoinMidgame(MatchState,WarmupTime,MatchTime,LevelStartingTime);
+		// if(PlayerHUD&&MatchState==MatchState::WaitingToStart)
+		// {
+		// 	PlayerHUD->AddAnnouncement();
+		// }
+	}
+}
+void AMyPlayerController::ClientJoinMidgame_Implementation(FName StateOfMatch,float Warmup,float Match,float StartingTime)
+{
+	WarmupTime=Warmup;
+	MatchTime=Match;
+	LevelStartingTime=StartingTime;
+	MatchState=StateOfMatch;
+	OnMatchStateSet(MatchState);
+	if(PlayerHUD&&MatchState==MatchState::WaitingToStart)
+	{
+		PlayerHUD->AddAnnouncement();
 	}
 }

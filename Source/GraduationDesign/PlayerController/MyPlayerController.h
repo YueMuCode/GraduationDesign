@@ -25,6 +25,7 @@ public:
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDCarriedAmmo(int32 Ammo);
 	void SetHUDMatchCountdown(float CountDownTime);
+	void SetHUDAnnouncementCountdown(float CountdownTime);
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -59,11 +60,19 @@ protected:
 	UPROPERTY()
 	APlayerHUD* PlayerHUD;
 	
-	float MatchTime=120.f;
+	float MatchTime=0.f;
+	float WarmupTime=0.f;
+	float LevelStartingTime=0.f;
 	uint32 CountdownInt=0;
 
 	
 	void PollInit();
+
+	UFUNCTION(Server,Reliable)
+	void ServerCheckMatchState();
+
+	UFUNCTION(Client,Reliable)
+	void ClientJoinMidgame(FName StateMatch,float Warmup,float Match,float StartingTime);
 private:
 	
 	//匹配状态
