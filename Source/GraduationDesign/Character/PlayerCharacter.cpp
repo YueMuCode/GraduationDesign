@@ -239,6 +239,10 @@ void APlayerCharacter::MulticastElim_Implementation()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
+	if (CombatComponent)
+	{
+		CombatComponent->FireButtonPressed(false);
+	}
 	//多播这个生成死亡机器人的效果
 	if(ElimBotEffect)
 	{
@@ -268,7 +272,9 @@ void APlayerCharacter::Destroyed()
 	{
 		ElimBotComponent->DestroyComponent();
 	}
-	if(CombatComponent&&CombatComponent->EquippedWeapon)
+	AGameLevel1GameMode* BlasterGameMode = Cast<AGameLevel1GameMode>(UGameplayStatics::GetGameMode(this));
+	bool bMatchNotInProgress = BlasterGameMode && BlasterGameMode->GetMatchState() != MatchState::InProgress;
+	if (CombatComponent && CombatComponent->EquippedWeapon && bMatchNotInProgress)
 	{
 		CombatComponent->EquippedWeapon->Destroy();
 	}

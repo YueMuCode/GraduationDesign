@@ -11,6 +11,8 @@
 #include "GraduationDesign/HUD/AnnouncementWidget.h"
 #include "GraduationDesign/HUD/CharacterOverlayWidget.h"
 #include "GraduationDesign/HUD/PlayerHUD.h"
+#include "GraduationDesign/PlayerState/PlayerGameState.h"
+#include "GraduationDesign/PlayerState/PlayerPlayerState.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
@@ -298,6 +300,35 @@ void AMyPlayerController::HandleCooldown()
 			PlayerHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
 			PlayerHUD->Announcement->InfoText->SetText(FText());
 			PlayerHUD->Announcement->AnnouncementText_1->SetText((FText()));
+			APlayerGameState* playerGameState = Cast<APlayerGameState>(UGameplayStatics::GetGameState(this));
+			APlayerPlayerState* PlayerPlayerState = GetPlayerState<APlayerPlayerState>();
+			if (playerGameState && PlayerPlayerState)
+			{
+				TArray<APlayerPlayerState*> TopPlayers = playerGameState->TopScoringPlayers;
+				FString InfoTextString;
+				if (TopPlayers.Num() == 0)
+				{
+					InfoTextString = FString("There is no winner.");
+				}
+				else if (TopPlayers.Num() == 1 && TopPlayers[0] == PlayerPlayerState)
+				{
+					InfoTextString = FString("You are the winner!");
+				}
+				else if (TopPlayers.Num() == 1)
+				{
+					InfoTextString = FString::Printf(TEXT("Winner: \n%s"), *TopPlayers[0]->GetPlayerName());
+				}
+				else if (TopPlayers.Num() > 1)
+				{
+					InfoTextString = FString("Players tied for the win:\n");
+					for (auto TiedPlayer : TopPlayers)
+					{
+						InfoTextString.Append(FString::Printf(TEXT("%s\n"), *TiedPlayer->GetPlayerName()));
+					}
+				}
+
+				PlayerHUD->Announcement->InfoText->SetText(FText::FromString(InfoTextString));
+			}
 		}
 	}
 	
@@ -307,6 +338,8 @@ void AMyPlayerController::HandleCooldown()
 		PlayerCharacter->bDisableGameplay=true;
 		PlayerCharacter->GetCombat()->FireButtonPressed(false);
 	}
+
+	
 	
 }
 
