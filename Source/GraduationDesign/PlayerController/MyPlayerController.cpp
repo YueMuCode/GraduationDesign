@@ -278,8 +278,8 @@ void AMyPlayerController::HandleMatchHasStarted()
 	PlayerHUD=PlayerHUD==nullptr?Cast<APlayerHUD>(GetHUD()):PlayerHUD;
 	if(PlayerHUD)
 	{
-		PlayerHUD->AddCharacterOverlay();//热身时间结束，就显示UI
-		if(PlayerHUD->Announcement)
+		if(PlayerHUD->CharacterOverlay==nullptr)PlayerHUD->AddCharacterOverlay();//热身时间结束，就显示UI
+		if(  PlayerHUD->Announcement)
 		{
 			PlayerHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
 		}

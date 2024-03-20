@@ -127,6 +127,9 @@ private:
 	//初始弹药容量
 	UPROPERTY(EditAnywhere)
 	int32 StartingARAmmo=30;
+
+	UPROPERTY(EditAnywhere)
+	int32 StartingRocketAmmo=0;
 	void InitializeCarriedAmmo();
 
 	//装弹
